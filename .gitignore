@@ -126,3 +126,4 @@ agentscope-service/.dev-stack/
 # Mintlify documentation dependencies and local preview
 /docs/node_modules/
 /docs/.mintlify/
+/agentscope-examples/agentscope-copilotkit/src/main/resources/static/
