@@ -62,7 +62,7 @@ public class BasicChatExample {
                 ReActAgent.builder()
                         .name("Assistant")
                         .sysPrompt("You are a helpful AI assistant. Be friendly and concise.")
-                        .model("dashscope:qwen-plus")
+                        .model("qwen3.7-flash-2026-07-15")
                         .toolkit(new Toolkit())
                         .build();
 

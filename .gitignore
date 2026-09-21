@@ -107,6 +107,9 @@ agentscope-service/aistio/coverage.*
 agentscope-service/aistio/.idea/
 agentscope-service/.dev-stack/
 
+# Local Postgres data bind-mounted by scripts/dev-up.sh
+/agentscope-service/docker/pgdata/
+
 # AgentScope Service release hygiene (reports remain local / CI artifacts).
 /agentscope-service/docs/test-reports/
 /agentscope-service/aistio/ui/*

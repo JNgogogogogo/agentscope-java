@@ -142,7 +142,7 @@ public class AgentConfiguration {
                 .model(
                         DashScopeChatModel.builder()
                                 .apiKey(apiKey)
-                                .modelName("qwen3.7-plus")
+                                .modelName("qwen3.7-flash-2026-07-15")
                                 .stream(true)
                                 .enableThinking(true)
                                 .formatter(new DashScopeChatFormatter())

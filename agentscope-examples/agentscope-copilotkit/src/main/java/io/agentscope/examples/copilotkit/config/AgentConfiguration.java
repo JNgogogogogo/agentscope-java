@@ -430,7 +430,7 @@ public class AgentConfiguration {
     private String getModelName() {
         String modelName = System.getenv("DASHSCOPE_MODEL");
         if (modelName == null || modelName.isEmpty()) {
-            return "qwen3.5-flash";
+            return "qwen3.7-flash-2026-07-15";
         }
         return modelName;
     }

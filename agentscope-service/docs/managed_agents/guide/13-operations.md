@@ -4,7 +4,7 @@
 
 ---
 
-本章讲 **如何把四层拆分的 AgentScope Service（gateway / control / data / scheduler）部署并运维起来**。  
+本章讲 **如何把四层拆分的 AgentScope Service（gateway / control / data / scheduler）部署并运维起来**。
 不要与 [Deployments](10-deployments.md)（产品资源：cron / webhook 触发会话）混淆。
 
 更细的配置表见仓库 [README_zh.md](../../README_zh.md) / [README.md](../../README.md)；多副本生产债见 [FOLLOW_UP_PRODUCTION.md](../WIP/FOLLOW_UP_PRODUCTION.md)。部署完成后用 [产品验证清单](14-validation.md) 做实操验收。
@@ -61,7 +61,7 @@ scripts/smoke.sh
 
 - 控制台（经网关）：`http://localhost:18080`
 - 默认账号：`admin` / `admin`（另有 demo：`bob`/`bob`、`alice`/`alice`）
-- 停止：`scripts/dev-down.sh`；运行状态（pid / 日志 / workspace / Artifact）在 `agentscope-service/.dev-stack/`，数据库位于 Docker 容器 `agentscope-dev-pg`
+- 停止：`scripts/dev-down.sh`；运行状态（pid / 日志 / workspace / Artifact）在 `agentscope-service/.dev-stack/`，数据库位于 Docker 容器 `agentscope-dev-pg`（数据落在 `agentscope-service/docker/pgdata/`，该目录不入库）
 - 前端热更：`cd agentscope-service/frontend && npm run dev`（vite 把 `/api` 代理到 :18080 网关）
 
 Docker 替代路径：
@@ -243,8 +243,8 @@ Managed Environment `type=sandbox` **不**使用本机 Docker，也不读已废�
 
 ## 10. 推荐阅读顺序
 
-1. 本章（部署形态与必改项）  
-2. [Quickstart](03-quickstart.md) 验证产品链路  
-3. [Environments](05-environments.md) + [Hands / Worker](08-hands-worker.md)  
-4. [FOLLOW_UP_PRODUCTION.md](../WIP/FOLLOW_UP_PRODUCTION.md) 多副本 / 跨机 Hands  
+1. 本章（部署形态与必改项）
+2. [Quickstart](03-quickstart.md) 验证产品链路
+3. [Environments](05-environments.md) + [Hands / Worker](08-hands-worker.md)
+4. [FOLLOW_UP_PRODUCTION.md](../WIP/FOLLOW_UP_PRODUCTION.md) 多副本 / 跨机 Hands
 5. [Limitations](12-limitations.md) 能力边界

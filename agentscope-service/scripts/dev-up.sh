@@ -6,7 +6,7 @@
 #   aistiod    :8081  (Go control plane: /api/*, /api/v1/*, console SPA)
 #   Data       :8082
 #   Scheduler  :8083
-#   Postgres   :5432  (schemas cp + rt + dp; via Docker)
+#   Postgres   :5432  (schemas cp + rt + dp; via Docker, data bind-mounted to docker/pgdata)
 #
 # aistiod runs standalone here (AISTIO_ENABLE_KUBERNETES=false), so no
 # reconcilers, CRD-backed APIs, or ASDP gRPC listener are started.
@@ -41,6 +41,7 @@ DATA_PORT="${BUILDER_DATA_PORT:-8082}"
 SCHED_PORT="${BUILDER_SCHEDULER_PORT:-8083}"
 PG_PORT="${BUILDER_PG_PORT:-5432}"
 PG_CONTAINER="${BUILDER_PG_CONTAINER:-agentscope-dev-pg}"
+PG_DATA_DIR="${BUILDER_PG_DATA_DIR:-$ROOT/docker/pgdata}"
 RESET_DB="${BUILDER_RESET_DB:-${BUILDER_REBUILD:-0}}"
 
 # jdbc profile requires >=32 chars and rejects known short defaults (see InternalTokenStartupValidator)
@@ -174,10 +175,30 @@ ensure_service_ports_available
 # stale snapshot. Root `mvn install` also walks agentscope-service children
 # (unlike `-pl agentscope-service`, which only builds the packaging=pom aggregator).
 if [ "${BUILDER_REBUILD:-0}" = "1" ] || [ ! -f "$(jar_of service-gateway || true)" ]; then
-    echo "==> Building agentscope-java monorepo (mvn install -DskipTests)"
+    echo "==> Building agentscope-java monorepo (mvn install -DskipTests, full log: ${LOG_DIR}/mvn-install.log)"
     MONOREPO_ROOT="$(cd "$ROOT/.." && pwd)"
-    (cd "$MONOREPO_ROOT" && mvn install -DskipTests -q)
+    if ! (cd "$MONOREPO_ROOT" && mvn install -T 1C -DskipTests >"$LOG_DIR/mvn-install.log" 2>&1); then
+        tail -n 40 "$LOG_DIR/mvn-install.log" >&2
+        exit 1
+    fi
 fi
+
+# ---------------------------------------------------------------- toolchain PATH
+# nvm/volta keep Node outside the default PATH and only inject it in interactive
+# shells; fall back to the newest nvm install (or volta) so non-interactive
+# shells (IDE run configs, CI) can still build the console.
+if ! command -v npm >/dev/null 2>&1; then
+    for tool_bin in "$(ls -d "$HOME"/.nvm/versions/node/*/bin 2>/dev/null | sort | tail -1)" \
+                    "$HOME/.volta/bin" /opt/homebrew/bin /usr/local/bin; do
+        if [ -x "$tool_bin/npm" ]; then
+            export PATH="$tool_bin:$PATH"
+            echo "  * npm not on PATH; using ${tool_bin}"
+            break
+        fi
+    done
+fi
+command -v npm >/dev/null 2>&1 || { echo "npm not found - install Node.js (e.g. nvm) to build the console" >&2; exit 1; }
+command -v go >/dev/null 2>&1 || { echo "go not found - install Go (brew install go) to build aistiod" >&2; exit 1; }
 
 # ---------------------------------------------------------------- build console
 # Generated UI assets are no longer tracked; a fresh clone must build the SPA.
@@ -199,17 +220,29 @@ if ! command -v docker >/dev/null 2>&1; then
     exit 1
 fi
 
+# A container created before the host data dir was configured keeps its original
+# anonymous volume; recreate it once so the bind mount takes effect. This resets
+# the disposable dev schemas (the abandoned anonymous volume stays on the host).
+pg_binds="$(docker inspect "$PG_CONTAINER" --format '{{range .HostConfig.Binds}}{{println .}}{{end}}' 2>/dev/null || true)"
+if docker ps -a --format '{{.Names}}' | grep -qx "$PG_CONTAINER" \
+    && ! printf '%s\n' "$pg_binds" | grep -qF "${PG_DATA_DIR}:"; then
+    echo "==> Recreating ${PG_CONTAINER} so data is stored in ${PG_DATA_DIR} (previous dev data is discarded)"
+    docker rm -f "$PG_CONTAINER" >/dev/null
+fi
+
 if ! docker ps --format '{{.Names}}' | grep -qx "$PG_CONTAINER"; then
     if docker ps -a --format '{{.Names}}' | grep -qx "$PG_CONTAINER"; then
         echo "==> Starting existing Postgres container ${PG_CONTAINER}"
         docker start "$PG_CONTAINER" >/dev/null
     else
-        echo "==> Creating Postgres container ${PG_CONTAINER} on :${PG_PORT}"
+        echo "==> Creating Postgres container ${PG_CONTAINER} on :${PG_PORT} (data: ${PG_DATA_DIR})"
+        mkdir -p "$PG_DATA_DIR"
         docker run -d --name "$PG_CONTAINER" \
             -e POSTGRES_DB=builder \
             -e POSTGRES_USER=builder \
             -e POSTGRES_PASSWORD=builder \
             -p "${PG_PORT}:5432" \
+            -v "$PG_DATA_DIR:/var/lib/postgresql/data" \
             -v "$ROOT/docker/postgres-init.sql:/docker-entrypoint-initdb.d/01-schemas.sql:ro" \
             postgres:17 >/dev/null
     fi
@@ -217,7 +250,10 @@ fi
 
 echo "==> Waiting for Postgres"
 for i in $(seq 1 60); do
-    if docker exec "$PG_CONTAINER" pg_isready -U builder -d builder >/dev/null 2>&1; then
+    # Probe over TCP: on first boot the image entrypoint runs a temporary
+    # socket-only server (for init scripts) that also answers socket probes;
+    # only the final server listens on TCP.
+    if docker exec "$PG_CONTAINER" pg_isready -h 127.0.0.1 -p 5432 -U builder -d builder >/dev/null 2>&1; then
         echo "  OK Postgres ready"
         break
     fi
