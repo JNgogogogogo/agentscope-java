@@ -137,11 +137,11 @@ function WorkflowList() {
   return (
     <Page>
       <PageHeader
-        title="Workflows"
-        description="Design repeatable work, publish a version and follow each execution."
+        title="Workflow"
+        description="设计可重复的工作，发布版本并跟踪每次执行。"
         actions={
           canCreate && (
-            <Button onClick={() => setCreating(true)}>Create Workflow</Button>
+            <Button onClick={() => setCreating(true)}>创建 Workflow</Button>
           )
         }
       />
@@ -158,7 +158,7 @@ function WorkflowList() {
       </label>
       <ErrorMessage error={query.error} />
       {query.isLoading ? (
-        <p>Loading Workflows…</p>
+        <p>正在加载 Workflow…</p>
       ) : query.data?.definitions.length ? (
         <div className="grid gap-4 md:grid-cols-2">
           {query.data.definitions.slice(0, 20).map((d) => (
@@ -170,11 +170,11 @@ function WorkflowList() {
               <div className="flex justify-between gap-3">
                 <span className="font-semibold">{d.name}</span>
                 <Badge>
-                  {d.archivedAt ? "Archived" : `Draft ${d.draftVersion}`}
+                  {d.archivedAt ? "已归档" : `Draft ${d.draftVersion}`}
                 </Badge>
               </div>
               <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-                {d.description || "No description yet."}
+                {d.description || "暂无描述。"}
               </p>
               <p className="mt-3 text-xs text-muted-foreground">
                 {d.draftSpec.nodes.length} steps · Updated{" "}
@@ -186,12 +186,12 @@ function WorkflowList() {
       ) : (
         !query.isError && (
           <EmptyState
-            title="No Workflows"
+            title="暂无 Workflow"
             description={canCreate
-              ? "Create a Workflow, configure its steps, then publish a version to run it."
-              : "No workflows are available in this namespace yet."}
+              ? "创建 Workflow，配置其步骤，然后发布一个版本即可运行。"
+              : "该空间中尚无可用 Workflow。"}
             action={canCreate && (
-              <Button onClick={() => setCreating(true)}>Create Workflow</Button>
+              <Button onClick={() => setCreating(true)}>创建 Workflow</Button>
             )}
           />
         )
@@ -215,7 +215,7 @@ function WorkflowList() {
       <Dialog open={creating} onOpenChange={setCreating}>
         <DialogContent size="md">
           <DialogHeader>
-            <DialogTitle>Create Workflow</DialogTitle>
+            <DialogTitle>创建 Workflow</DialogTitle>
             <DialogDescription>
               Start with an Agent step, then add branches, approvals or other
               steps.
@@ -241,7 +241,7 @@ function WorkflowList() {
                 value={agent}
                 onChange={setAgent}
                 required
-                aria-label="Initial Workflow Agent"
+                aria-label="初始 Workflow Agent"
               />
               <ErrorMessage error={create.error} />
               <Button disabled={!name.trim() || !agent || create.isPending}>
@@ -354,13 +354,13 @@ function WorkflowDetail({ id }: { id: string }) {
     onSuccess: () => {
       setDraft(null);
       setBaseVersion(undefined);
-      setValidation("Draft saved. Validate and publish when ready.");
+      setValidation("草稿已保存。准备好后校验并发布。");
       refresh();
     },
   });
   const validate = useMutation({
     mutationFn: () => validateDefinition(id, parsed.spec!),
-    onSuccess: () => setValidation("Valid workflow"),
+    onSuccess: () => setValidation("有效的 workflow"),
     onError: (error) => setValidation(String(error)),
   });
   const publish = useMutation({
@@ -375,7 +375,7 @@ function WorkflowDetail({ id }: { id: string }) {
     mutationFn: () => {
       const value = JSON.parse(input);
       if (!value || typeof value !== "object" || Array.isArray(value))
-        throw new Error("Input must be a JSON object.");
+        throw new Error("输入必须是 JSON 对象。");
       return startRun(id, {
         revisionId: selectedRevision?.id,
         idempotencyKey: requestKey,
@@ -385,7 +385,7 @@ function WorkflowDetail({ id }: { id: string }) {
           : {
               issue: {
                 title: issue.trim(),
-                description: "Started from Workflow " + definition?.name,
+                description: "来自 Workflow " + definition?.name,
               },
             }),
       });
@@ -402,12 +402,12 @@ function WorkflowDetail({ id }: { id: string }) {
   const identities = useEntityIdentities(
     records.map((r) => ({ type: "issue", ref: r.rootIssueId })),
   );
-  if (detail.isLoading) return <Page>Loading Workflow…</Page>;
+  if (detail.isLoading) return <Page>正在加载 Workflow…</Page>;
   if (!definition)
     return (
       <Page>
-        <ErrorMessage error={detail.error || "Workflow unavailable"} />
-        <Button onClick={() => detail.refetch()}>Retry</Button>
+        <ErrorMessage error={detail.error || "Workflow 不可用"} />
+        <Button onClick={() => detail.refetch()}>重试</Button>
       </Page>
     );
   const filtered = records.filter(
@@ -426,15 +426,15 @@ function WorkflowDetail({ id }: { id: string }) {
   const runList = (compact = false) => (
     <div className="rounded-xl border border-border bg-white p-5">
       <h3 className="font-semibold">
-        {compact ? "Recent executions" : "Executions"}
+        {compact ? "最近的执行" : "执行记录"}
       </h3>
       <ErrorMessage error={history.error} />
       {!compact && (
         <div className="my-4 flex flex-wrap gap-2">
           <Input
             className="min-w-48 flex-1"
-            aria-label="Search executions"
-            placeholder="Search work item, input, result or Run ID"
+            aria-label="搜索执行记录"
+            placeholder="搜索工作项、输入、结果或 Run ID"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -442,7 +442,7 @@ function WorkflowDetail({ id }: { id: string }) {
             }}
           />
           <select
-            aria-label="Execution status"
+            aria-label="执行状态"
             className="rounded border border-border p-2 text-sm"
             value={state}
             onChange={(e) => {
@@ -450,8 +450,8 @@ function WorkflowDetail({ id }: { id: string }) {
               setPage(0);
             }}
           >
-            <option value="all">All states</option>
-            <option value="active">In progress</option>
+            <option value="all">全部状态</option>
+            <option value="active">进行中</option>
             {["succeeded", "partial_succeeded", "failed", "cancelled"].map(
               (v) => (
                 <option key={v} value={v}>
@@ -463,7 +463,7 @@ function WorkflowDetail({ id }: { id: string }) {
         </div>
       )}
       {history.isLoading ? (
-        <p className="py-4 text-sm">Loading executions…</p>
+        <p className="py-4 text-sm">正在加载执行记录…</p>
       ) : (
         (compact
           ? records.slice(0, 5)
@@ -485,7 +485,7 @@ function WorkflowDetail({ id }: { id: string }) {
                 r.waitReason ||
                 summarizeOutput(r.output) ||
                 summarizeOutput(r.input) ||
-                "No output yet."}
+                "暂无输出。"}
             </p>
             <p className="mt-2 text-xs text-muted-foreground">
               Version{" "}
@@ -546,15 +546,15 @@ function WorkflowDetail({ id }: { id: string }) {
             {definition.name}
             <Badge>
               {definition.archivedAt
-                ? "Archived"
+                ? "已归档"
                 : selectedRevision
                   ? `Published v${versions[0].revision}`
-                  : "Unpublished"}
+                  : "未发布"}
             </Badge>
           </span>
         }
         description={
-          definition.description || "A versioned workflow for repeatable work."
+          definition.description || "用于可重复工作的版本化 workflow。"
         }
         actions={
           <>
@@ -579,7 +579,7 @@ function WorkflowDetail({ id }: { id: string }) {
         }
       />
       <nav
-        aria-label="Workflow sections"
+        aria-label="Workflow 分区"
         className="flex overflow-x-auto border-b border-border"
       >
         {tabs.map((t) => (
@@ -589,7 +589,7 @@ function WorkflowDetail({ id }: { id: string }) {
             onClick={() => selectTab(t)}
             className={`whitespace-nowrap border-b-2 px-4 py-3 text-sm capitalize ${tab === t ? "border-primary font-medium" : "border-transparent text-muted-foreground"}`}
           >
-            {t === "design" ? "Workflow design" : t}
+            {t === "design" ? "Workflow 设计" : t}
           </button>
         ))}
       </nav>
@@ -599,7 +599,7 @@ function WorkflowDetail({ id }: { id: string }) {
           You have unsaved changes in Workflow design. Save the draft before
           publishing.
           {baseVersion !== definition.version
-            ? " The server version has changed; save will detect the conflict."
+            ? " 服务端版本已变更；保存时会检测到冲突。"
             : ""}
         </p>
       )}
@@ -608,11 +608,11 @@ function WorkflowDetail({ id }: { id: string }) {
           <div className="grid gap-3 sm:grid-cols-4">
             {[
               [
-                "Published version",
+                "已发布版本",
                 versions[0] ? `v${versions[0].revision}` : "None",
               ],
               [
-                "Steps",
+                "步骤",
                 String(
                   selectedRevision?.spec.nodes.length ??
                     definition.draftSpec.nodes.length,
@@ -625,7 +625,7 @@ function WorkflowDetail({ id }: { id: string }) {
                   : String(records.filter((r) => !terminalRun(r.state)).length),
               ],
               [
-                "Failed executions",
+                "失败的执行",
                 history.isLoading || history.error
                   ? "—"
                   : String(records.filter((r) => r.state === "failed").length),
@@ -642,7 +642,7 @@ function WorkflowDetail({ id }: { id: string }) {
               <p className="mb-3 text-sm font-medium">
                 {selectedRevision
                   ? `Published topology · v${selectedRevision.revision}`
-                  : "Draft topology"}
+                  : "草稿拓扑"}
               </p>
               <WorkflowGraph
                 nodes={(
@@ -796,8 +796,8 @@ function WorkflowDetail({ id }: { id: string }) {
           ))}
           {!versions.length && (
             <EmptyState
-              title="No published versions"
-              description="Save and validate your draft, then publish it from Workflow design."
+              title="暂无已发布版本"
+              description="保存并校验草稿，然后在 Workflow 设计中发布它。"
             />
           )}
         </div>
@@ -830,8 +830,8 @@ function WorkflowDetail({ id }: { id: string }) {
           </div>
         ) : (
           <EmptyState
-            title="Publish a version first"
-            description="An API always targets a published Workflow version."
+            title="请先发布一个版本"
+            description="API 始终指向某个已发布的 Workflow 版本。"
           />
         ))}
       {tab === "settings" && (
@@ -882,20 +882,20 @@ function WorkflowDetail({ id }: { id: string }) {
                     setIssue("");
                   }}
                 >
-                  <option value="new">Create an Issue</option>
-                  <option value="existing">Use an existing Issue</option>
+                  <option value="new">创建 Issue</option>
+                  <option value="existing">使用已有 Issue</option>
                 </select>
               </label>
               <Input
                 aria-label={
-                  issueMode === "new" ? "Issue title" : "Existing Issue ID"
+                  issueMode === "new" ? "Issue 标题" : "已有 Issue ID"
                 }
                 value={issue}
                 onChange={(e) => setIssue(e.target.value)}
                 placeholder={
                   issueMode === "new"
-                    ? "What should this workflow accomplish?"
-                    : "Existing Issue UUID"
+                    ? "这个 workflow 要完成什么？"
+                    : "已有 Issue UUID"
                 }
                 required
               />
@@ -983,7 +983,7 @@ function WorkflowSettings({
       </p>
       <ErrorMessage error={save.error} />
       {canEdit && (
-        <Button disabled={!name.trim() || save.isPending}>Save settings</Button>
+        <Button disabled={!name.trim() || save.isPending}>保存设置</Button>
       )}
     </form>
   );

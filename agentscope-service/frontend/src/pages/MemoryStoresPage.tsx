@@ -95,7 +95,7 @@ export default function MemoryStoresPage() {
     try {
       setStores(await listMemoryStores());
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed to load');
+      setErr(e instanceof Error ? e.message : '加载失败');
     } finally {
       setLoading(false);
     }
@@ -107,7 +107,7 @@ export default function MemoryStoresPage() {
     try {
       setMemories(await listMemories(store.id));
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed to load memories');
+      setErr(e instanceof Error ? e.message : '加载记忆失败');
     }
   }
 
@@ -125,35 +125,35 @@ export default function MemoryStoresPage() {
       await refreshStores();
       await loadMemories(created);
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Create failed');
+      setErr(e instanceof Error ? e.message : '创建失败');
     } finally {
       setBusyId(null);
     }
   }
 
   async function handleArchiveStore(id: string) {
-    if (!confirm('Archive this memory store? It will no longer mount on new sessions.')) return;
+    if (!confirm('归档该记忆库？之后不会再挂载到新 Session。')) return;
     setBusyId(id);
     try {
       await archiveMemoryStore(id);
       if (selected?.id === id) { setSelected(null); setMemories([]); }
       await refreshStores();
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Archive failed');
+      setErr(e instanceof Error ? e.message : '归档失败');
     } finally {
       setBusyId(null);
     }
   }
 
   async function handleDeleteStore(id: string) {
-    if (!confirm('Delete this memory store and all memories?')) return;
+    if (!confirm('删除该记忆库及其全部记忆？')) return;
     setBusyId(id);
     try {
       await deleteMemoryStore(id);
       if (selected?.id === id) { setSelected(null); setMemories([]); }
       await refreshStores();
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Delete failed');
+      setErr(e instanceof Error ? e.message : '删除失败');
     } finally {
       setBusyId(null);
     }
@@ -161,13 +161,13 @@ export default function MemoryStoresPage() {
 
   async function handleRedactMemory(path: string) {
     if (!selected) return;
-    if (!confirm(`Redact "${path}" permanently? Version history will be cleared.`)) return;
+    if (!confirm(`永久脱敏 "${path}"？版本历史将被清除。`)) return;
     setBusyId(path);
     try {
       await redactMemory(selected.id, path);
       await loadMemories(selected);
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Redact failed');
+      setErr(e instanceof Error ? e.message : '脱敏失败');
     } finally {
       setBusyId(null);
     }
@@ -182,20 +182,20 @@ export default function MemoryStoresPage() {
       setEditing(null);
       await loadMemories(selected);
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Save failed');
+      setErr(e instanceof Error ? e.message : '保存失败');
     } finally {
       setBusyId(null);
     }
   }
 
   async function handleDeleteMemory(path: string) {
-    if (!selected || !confirm(`Delete memory "${path}"?`)) return;
+    if (!selected || !confirm(`删除记忆 "${path}"？`)) return;
     setBusyId(path);
     try {
       await deleteMemory(selected.id, path);
       await loadMemories(selected);
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Delete failed');
+      setErr(e instanceof Error ? e.message : '删除失败');
     } finally {
       setBusyId(null);
     }
@@ -204,8 +204,8 @@ export default function MemoryStoresPage() {
   return (
     <div className="console-page-legacy" style={S.root}>
       <div style={S.header}>
-        <h1 style={S.title}>Memory Stores</h1>
-        <button type="button" style={S.primaryBtn} onClick={() => setCreating(true)}>＋ New store</button>
+        <h1 style={S.title}>记忆库</h1>
+        <button type="button" style={S.primaryBtn} onClick={() => setCreating(true)}>＋ 新建记忆库</button>
       </div>
       <p style={S.blurb}>
         Store shared knowledge for use across sessions. Bind a store in the Agent’s resource settings or attach it when starting a Managed session.
@@ -214,7 +214,7 @@ export default function MemoryStoresPage() {
         Managed Agents discover and read bound documents through memory tools as needed. The full store is not automatically added to every model prompt. Shared knowledge is read-only during execution; update documents here. Session working memory remains separate from this shared store.
       </div>
       {err && <div style={S.err}>{err}</div>}
-      {loading && <div style={{ color: '#64748b' }}>Loading…</div>}
+      {loading && <div style={{ color: '#64748b' }}>加载中…</div>}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(260px,1fr)_minmax(0,2fr)]">
         <div>
@@ -251,7 +251,7 @@ export default function MemoryStoresPage() {
             </div>
           ))}
           {!loading && stores.length === 0 && (
-            <div style={{ color: '#94a3b8', fontStyle: 'italic' }}>No memory stores yet.</div>
+            <div style={{ color: '#94a3b8', fontStyle: 'italic' }}>暂无记忆库。</div>
           )}
         </div>
 
@@ -272,9 +272,9 @@ export default function MemoryStoresPage() {
               <table style={S.table}>
                 <thead>
                   <tr>
-                    <th style={S.th}>Path</th>
-                    <th style={S.th}>Version</th>
-                    <th style={S.th}>Actions</th>
+                    <th style={S.th}>路径</th>
+                    <th style={S.th}>版本</th>
+                    <th style={S.th}>操作</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -283,22 +283,22 @@ export default function MemoryStoresPage() {
                       <td style={S.td}><code>{m.path}</code></td>
                       <td style={S.td}>v{m.headVersion}</td>
                       <td style={S.td}>
-                        <button type="button" style={S.rowBtn} onClick={() => setEditing({ path: m.path, content: m.content })}>Edit</button>
+                        <button type="button" style={S.rowBtn} onClick={() => setEditing({ path: m.path, content: m.content })}>编辑</button>
                         {' '}
-                        <button type="button" style={S.rowBtn} onClick={() => handleRedactMemory(m.path)}>Redact</button>
+                        <button type="button" style={S.rowBtn} onClick={() => handleRedactMemory(m.path)}>脱敏</button>
                         {' '}
-                        <button type="button" style={{ ...S.rowBtn, ...S.danger }} onClick={() => handleDeleteMemory(m.path)}>Delete</button>
+                        <button type="button" style={{ ...S.rowBtn, ...S.danger }} onClick={() => handleDeleteMemory(m.path)}>删除</button>
                       </td>
                     </tr>
                   ))}
                   {memories.length === 0 && (
-                    <tr><td colSpan={3} style={{ ...S.td, color: '#94a3b8', fontStyle: 'italic' }}>No memories in this store.</td></tr>
+                    <tr><td colSpan={3} style={{ ...S.td, color: '#94a3b8', fontStyle: 'italic' }}>该记忆库中暂无记忆。</td></tr>
                   )}
                 </tbody>
               </table>
             </div>
           ) : (
-            <div style={{ color: '#94a3b8', padding: '40px 0', textAlign: 'center' }}>Select a store to view memories.</div>
+            <div style={{ color: '#94a3b8', padding: '40px 0', textAlign: 'center' }}>选择一个记忆库查看记忆。</div>
           )}
         </div>
       </div>
@@ -306,15 +306,15 @@ export default function MemoryStoresPage() {
       {creating && (
         <div style={S.modal} onClick={() => setCreating(false)}>
           <div style={S.modalBody} onClick={e => e.stopPropagation()}>
-            <h2 style={{ margin: '0 0 18px', fontSize: '1.2rem' }}>New memory store</h2>
+            <h2 style={{ margin: '0 0 18px', fontSize: '1.2rem' }}>新建记忆库</h2>
             <form onSubmit={handleCreateStore}>
-              <label style={S.formField}>Name</label>
+              <label style={S.formField}>名称</label>
               <input style={{ ...S.input, marginBottom: 14 }} value={storeName} onChange={e => setStoreName(e.target.value)} autoFocus />
-              <label style={S.formField}>Description</label>
+              <label style={S.formField}>描述</label>
               <input style={{ ...S.input, marginBottom: 20 }} value={storeDesc} onChange={e => setStoreDesc(e.target.value)} />
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button type="button" style={S.rowBtn} onClick={() => setCreating(false)}>Cancel</button>
-                <button type="submit" style={S.primaryBtn} disabled={busyId === 'create'}>Create</button>
+                <button type="button" style={S.rowBtn} onClick={() => setCreating(false)}>取消</button>
+                <button type="submit" style={S.primaryBtn} disabled={busyId === 'create'}>创建</button>
               </div>
             </form>
           </div>
@@ -324,15 +324,15 @@ export default function MemoryStoresPage() {
       {editing && selected && (
         <div style={S.modal} onClick={() => setEditing(null)}>
           <div style={{ ...S.modalBody, maxWidth: 560 }} onClick={e => e.stopPropagation()}>
-            <h2 style={{ margin: '0 0 18px', fontSize: '1.2rem' }}>Edit memory</h2>
+            <h2 style={{ margin: '0 0 18px', fontSize: '1.2rem' }}>编辑记忆</h2>
             <form onSubmit={handleSaveMemory}>
-              <label style={S.formField}>Path</label>
+              <label style={S.formField}>路径</label>
               <input style={{ ...S.input, marginBottom: 14 }} value={editing.path} onChange={e => setEditing({ ...editing, path: e.target.value })} />
-              <label style={S.formField}>Content</label>
+              <label style={S.formField}>内容</label>
               <textarea style={{ ...S.textarea, marginBottom: 20 }} value={editing.content} onChange={e => setEditing({ ...editing, content: e.target.value })} />
               <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button type="button" style={S.rowBtn} onClick={() => setEditing(null)}>Cancel</button>
-                <button type="submit" style={S.primaryBtn} disabled={busyId === 'save'}>Save</button>
+                <button type="button" style={S.rowBtn} onClick={() => setEditing(null)}>取消</button>
+                <button type="submit" style={S.primaryBtn} disabled={busyId === 'save'}>保存</button>
               </div>
             </form>
           </div>

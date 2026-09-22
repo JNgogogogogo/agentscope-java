@@ -95,10 +95,10 @@ function capabilityLabels(capabilities?: RuntimeCapabilityDescriptor): string[] 
   if (!capabilities) return [];
   const labels: string[] = [];
   if (capabilities.workspace?.supported) labels.push('Workspace');
-  if (capabilities.skills?.supported) labels.push('Skills');
-  if (capabilities.tools?.supported) labels.push('Tools');
+  if (capabilities.skills?.supported) labels.push('技能');
+  if (capabilities.tools?.supported) labels.push('工具');
   if (capabilities.mcp?.supported) labels.push('MCP');
-  if (capabilities.resume) labels.push('Resume');
+  if (capabilities.resume) labels.push('继续');
   return labels;
 }
 
@@ -110,9 +110,9 @@ function capabilityDetails(capabilities?: RuntimeCapabilityDescriptor): string {
     return `${label}: ${(capability.mode || 'native').replace(/-/g, ' ')}`;
   };
   return [
-    describe('Instructions', capabilities.instructions),
-    describe('Skills', capabilities.skills),
-    describe('Tools', capabilities.tools),
+    describe('指令', capabilities.instructions),
+    describe('技能', capabilities.skills),
+    describe('工具', capabilities.tools),
     describe('MCP', capabilities.mcp),
     `Session resume: ${capabilities.resume ? 'supported' : 'one-shot'}`,
   ].join(' · ');
@@ -185,7 +185,7 @@ export default function AgentCreatePage() {
       const created = await createAgent(req);
       navigate(scope.scopedPath(`/agent-center/agents/${encodeURIComponent(created.id)}`), { replace: true });
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed to create');
+      setErr(e instanceof Error ? e.message : '创建失败');
     } finally { setSubmitting(false); }
   }
 
@@ -193,28 +193,28 @@ export default function AgentCreatePage() {
     <div className="console-page-legacy" style={S.page}>
       <header style={S.header}>
         <div style={S.headerMain}>
-          <button type="button" aria-label="Back to previous page" title="Back to previous page" style={S.back} onClick={() => navigate(-1)}><ArrowLeft size={20} /></button>
-          <div><h1 style={S.title}>Create an agent</h1><p style={S.subtitle}>Review and configure</p></div>
+          <button type="button" aria-label="返回上一页" title="返回上一页" style={S.back} onClick={() => navigate(-1)}><ArrowLeft size={20} /></button>
+          <div><h1 style={S.title}>创建 Agent</h1><p style={S.subtitle}>查看并配置</p></div>
         </div>
-        <span style={S.headerPill}>{execution?.name ?? 'Detecting runtime…'}</span>
+        <span style={S.headerPill}>{execution?.name ?? '正在检测运行时…'}</span>
       </header>
 
       <div style={S.content}>
         <section style={S.section}>
-          <h2 style={S.sectionTitle}><Bot size={19} /> Identity</h2>
-          <p style={S.sectionHint}>Give the agent a recognizable name and a concise purpose.</p>
+          <h2 style={S.sectionTitle}><Bot size={19} /> 身份</h2>
+          <p style={S.sectionHint}>给该 Agent 起一个易识别的名称，并写一句简洁的用途说明。</p>
           <div style={S.card}>
             <div style={S.row}>
-              <label htmlFor="agent-name" style={S.label}>Name</label>
+              <label htmlFor="agent-name" style={S.label}>名称</label>
               <input id="agent-name" style={S.input} value={name} onChange={e => {
                 setName(e.target.value);
                 if (!agentKeyCustomized) setAgentKey(e.target.value.trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, ''));
               }} placeholder="e.g. Repository reviewer" autoFocus />
             </div>
             <div style={{ ...S.row, ...S.lastRow }}>
-              <label htmlFor="agent-description" style={S.label}>Description</label>
+              <label htmlFor="agent-description" style={S.label}>描述</label>
               <div>
-                <textarea id="agent-description" style={{ ...S.textarea, minHeight: 90, fontFamily: 'inherit' }} value={description} onChange={e => setDescription(e.target.value)} placeholder="What does this agent do?" maxLength={255} />
+                <textarea id="agent-description" style={{ ...S.textarea, minHeight: 90, fontFamily: 'inherit' }} value={description} onChange={e => setDescription(e.target.value)} placeholder="这个 Agent 做什么？" maxLength={255} />
                 <div style={{ ...S.hint, textAlign: 'right' }}>{description.length} / 255</div>
               </div>
             </div>
@@ -222,24 +222,24 @@ export default function AgentCreatePage() {
         </section>
 
         <section style={S.section}>
-          <h2 style={S.sectionTitle}><Sparkles size={19} /> Behavior &amp; capabilities</h2>
-          <p style={S.sectionHint}>Define how it should work and attach workspace capabilities it can rely on.</p>
+          <h2 style={S.sectionTitle}><Sparkles size={19} /> 行为与能力</h2>
+          <p style={S.sectionHint}>定义它的工作方式，并挂载它可以依赖的 Workspace 能力。</p>
           <div style={S.card}>
             <div style={S.row}>
               <label htmlFor="agent-instructions" style={S.label}>Instructions</label>
               <div>
-                <textarea id="agent-instructions" style={S.textarea} value={sysPrompt} onChange={e => setSysPrompt(e.target.value)} placeholder="Write what this agent should do, what to focus on, and what to avoid…" />
-                <div style={S.hint}>The selected runtime adapter maps these instructions to its native prompt or configuration.</div>
+                <textarea id="agent-instructions" style={S.textarea} value={sysPrompt} onChange={e => setSysPrompt(e.target.value)} placeholder="写下该 Agent 应该做什么、重点关注什么、避免什么…" />
+                <div style={S.hint}>所选运行时适配器会把这些指令映射为其原生的提示词或配置。</div>
               </div>
             </div>
             <div style={{ ...S.row, ...S.lastRow }}>
               <label htmlFor="agent-workspace" style={S.label}>Workspace</label>
               <div>
                 <select id="agent-workspace" style={S.input} value={workspaceId} onChange={e => setWorkspaceId(e.target.value)}>
-                  <option value="">No linked workspace</option>
+                  <option value="">未关联 Workspace</option>
                   {workspaces.map(workspace => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}
                 </select>
-                <div style={S.hint}>A workspace is the portable source for repository guidance, skills, tools, and subagents.</div>
+                <div style={S.hint}>Workspace 是仓库指引、技能、工具与 Subagent 的可移植来源。</div>
                 {preview && <div style={S.preview}><strong>{preview.name}</strong> · {preview.agentsMdExists ? 'AGENTS.md · ' : ''}{preview.skillCount ?? 0} skills · {preview.subagentCount ?? 0} subagents</div>}
               </div>
             </div>
@@ -247,25 +247,25 @@ export default function AgentCreatePage() {
         </section>
 
         <section style={S.section}>
-          <h2 style={S.sectionTitle}><Cpu size={19} /> Execution</h2>
-          <p style={S.sectionHint}>Choose where the agent runs. Hosts, pools, profiles, and CLI commands are resolved behind this selection.</p>
+          <h2 style={S.sectionTitle}><Cpu size={19} /> 执行</h2>
+          <p style={S.sectionHint}>选择 Agent 的运行位置。主机、池、Profile 与 CLI 命令都在该选择背后解析。</p>
           <div style={S.card}>
             <div style={S.row}>
-              <label htmlFor="agent-runtime" style={S.label}>Runtime</label>
+              <label htmlFor="agent-runtime" style={S.label}>运行时</label>
               <div>
                 <select id="agent-runtime" style={S.input} value={executionId} onChange={e => { setExecutionCustomized(true); setExecutionId(e.target.value); }}>
                   {runtimes.map(runtime => <option key={runtime.id} value={runtime.id}>{runtime.name}</option>)}
                   <option value="managed">{managedRuntime.name}</option>
                 </select>
-                {runtimes.length === 0 && <div style={S.hint}>No local agent runtime is online, so AgentScope Managed is selected.</div>}
+                {runtimes.length === 0 && <div style={S.hint}>本地没有在线的 Agent 运行时，已选中 AgentScope Managed。</div>}
                 {labels.length > 0 && <div style={S.capabilityList}>{labels.map(label => <span key={label} style={S.capability}>{label}</span>)}</div>}
                 {capabilityDetail && <div style={S.hint}>{capabilityDetail}</div>}
               </div>
             </div>
             <div style={{ ...S.row, ...S.lastRow }}>
-              <label htmlFor="agent-model" style={S.label}>Model</label>
+              <label htmlFor="agent-model" style={S.label}>模型</label>
               <div>
-                <input id="agent-model" style={S.input} value={model} onChange={e => setModel(e.target.value)} placeholder="Default (provider)" />
+                <input id="agent-model" style={S.input} value={model} onChange={e => setModel(e.target.value)} placeholder="默认（服务商）" />
                 <div style={S.hint}>Optional override. Leave blank to use the runtime provider's default model.</div>
               </div>
             </div>
@@ -273,29 +273,29 @@ export default function AgentCreatePage() {
         </section>
 
         <details style={S.details}>
-          <summary style={S.summary}>Advanced settings</summary>
+          <summary style={S.summary}>高级设置</summary>
           <div style={{ ...S.row, paddingLeft: 0, paddingRight: 0 }}>
             <label htmlFor="agent-key" style={S.label}>Agent key</label>
             <div><input id="agent-key" style={S.input} value={agentKey} onChange={e => { setAgentKeyCustomized(true); setAgentKey(e.target.value.toLowerCase().replace(/[^a-z0-9_-]+/g, '-')); }} placeholder="repository-reviewer" /><div style={S.hint}>{scope.selectorVisible ? 'Stable identity inside the current tenant and namespace.' : 'Stable identity for this agent.'}</div></div>
           </div>
           {runtimeKind === 'managed' && <div style={{ ...S.row, paddingLeft: 0, paddingRight: 0 }}>
-            <label htmlFor="agent-environment" style={S.label}><FolderKanban size={16} /> Environment</label>
+            <label htmlFor="agent-environment" style={S.label}><FolderKanban size={16} /> 环境</label>
             <select id="agent-environment" style={S.input} value={defaultEnvironmentId} onChange={e => setDefaultEnvironmentId(e.target.value)}>
-              <option value="">Automatic local default</option>
+              <option value="">自动（本地默认）</option>
               {environments.map(environment => <option key={environment.id} value={environment.id}>{environment.name} ({environment.type})</option>)}
             </select>
           </div>}
           {runtimeKind === 'managed' && <div style={{ ...S.row, ...S.lastRow, paddingLeft: 0, paddingRight: 0 }}>
-            <label htmlFor="agent-workspace-path" style={S.label}><Wrench size={16} /> Workspace path</label>
-            <input id="agent-workspace-path" style={S.input} value={workspacePath} onChange={e => setWorkspacePath(e.target.value)} placeholder="Automatic" />
+            <label htmlFor="agent-workspace-path" style={S.label}><Wrench size={16} /> Workspace 路径</label>
+            <input id="agent-workspace-path" style={S.input} value={workspacePath} onChange={e => setWorkspacePath(e.target.value)} placeholder="自动" />
           </div>}
         </details>
       </div>
 
       <footer style={S.footer}>
         {err && <span style={S.error}>{err}</span>}
-        <button style={S.secondary} onClick={() => navigate(scope.scopedPath('/agent-center/agents'))}>Cancel</button>
-        <button style={{ ...S.primary, ...(canSubmit ? {} : S.disabled) }} onClick={handleSubmit} disabled={!canSubmit}>{submitting ? 'Creating…' : 'Create & open agent'}</button>
+        <button style={S.secondary} onClick={() => navigate(scope.scopedPath('/agent-center/agents'))}>取消</button>
+        <button style={{ ...S.primary, ...(canSubmit ? {} : S.disabled) }} onClick={handleSubmit} disabled={!canSubmit}>{submitting ? '创建中…' : '创建并打开 Agent'}</button>
       </footer>
     </div>
   );

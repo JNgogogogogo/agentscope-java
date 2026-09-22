@@ -90,7 +90,7 @@ function tone(
         : "default";
 }
 function summary(record: AgentActivityRecord) {
-  if (!record.task) return "Open messages and execution context";
+  if (!record.task) return "打开消息与执行上下文";
   return (
     record.task.errorMessage ||
     resultSummary(record.task.result) ||
@@ -98,7 +98,7 @@ function summary(record: AgentActivityRecord) {
       ? "Waiting for the next step"
       : isWorking(record.status)
         ? "Work is in progress"
-        : "Open the work record for details")
+        : "打开工作记录查看详情")
   );
 }
 
@@ -123,7 +123,7 @@ export function ActivitySummary({
       "attention",
     ],
     [
-      "Completed · 24h",
+      "已完成 · 24h",
       data.records.filter(
         (item) =>
           item.status === "completed" &&
@@ -265,11 +265,11 @@ export function AgentActivityPanel({
       <section className="overflow-hidden rounded-xl border border-border bg-white">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
           {compact ? (
-            <h2 className="font-semibold">Recent work</h2>
+            <h2 className="font-semibold">近期工作</h2>
           ) : (
             <div
               className="flex rounded-lg bg-muted p-1"
-              aria-label="Activity view"
+              aria-label="活动视图"
             >
               <Button
                 size="sm"
@@ -321,28 +321,28 @@ export function AgentActivityPanel({
             </div>
             <select
               className={selectClass}
-              aria-label="Activity status"
+              aria-label="活动状态"
               value={status}
               onChange={(e) => reset(() => setStatus(e.target.value))}
             >
-              <option value="all">All statuses</option>
-              <option value="working">In progress</option>
-              <option value="attention">Needs attention</option>
+              <option value="all">全部状态</option>
+              <option value="working">进行中</option>
+              <option value="attention">需关注</option>
               <option value="waiting">Waiting</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-              <option value="idle">Idle</option>
-              <option value="active">Active session</option>
-              <option value="archived">Archived</option>
+              <option value="completed">已完成</option>
+              <option value="cancelled">已取消</option>
+              <option value="idle">空闲</option>
+              <option value="active">活跃 Session</option>
+              <option value="archived">已归档</option>
               <option value="terminated">Terminated</option>
             </select>
             <select
               className={selectClass}
-              aria-label="Activity source"
+              aria-label="活动来源"
               value={source}
               onChange={(e) => reset(() => setSource(e.target.value))}
             >
-              <option value="all">All sources</option>
+              <option value="all">全部来源</option>
               {[
                 ...new Set(
                   sessionsView
@@ -357,14 +357,14 @@ export function AgentActivityPanel({
             </select>
             <select
               className={selectClass}
-              aria-label="Activity time range"
+              aria-label="活动时间范围"
               value={period}
               onChange={(e) => reset(() => setPeriod(e.target.value))}
             >
-              <option value="all">All time</option>
-              <option value="1">Last 24 hours</option>
-              <option value="7">Last 7 days</option>
-              <option value="30">Last 30 days</option>
+              <option value="all">全部时间</option>
+              <option value="1">最近 24 小时</option>
+              <option value="7">最近 7 天</option>
+              <option value="30">最近 30 天</option>
             </select>
           </div>
         )}
@@ -400,8 +400,8 @@ export function AgentActivityPanel({
                     Session / related work
                   </th>
                   <th className="px-4 py-3 font-medium">State</th>
-                  <th className="px-4 py-3 font-medium">Context</th>
-                  <th className="px-5 py-3 font-medium">Last active</th>
+                  <th className="px-4 py-3 font-medium">上下文</th>
+                  <th className="px-5 py-3 font-medium">最近活跃</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -511,8 +511,8 @@ export function AgentActivityPanel({
           <EmptyState
             title={
               search || status !== "all" || source !== "all" || period !== "all"
-                ? "No matching activity"
-                : "No activity yet"
+                ? "没有匹配的活动"
+                : "暂无活动"
             }
             description="Work records appear when this Agent handles a request. Idle runtime sessions remain available in the session view."
             className="py-12"
@@ -584,18 +584,18 @@ export function AgentActivityPanel({
                   <section>
                     <h3 className="mb-3 text-sm font-semibold">
                       {(selected.attempts?.length || 0) > 1
-                        ? "Latest attempt timeline"
-                        : "Execution timeline"}
+                        ? "最近一次尝试的时间线"
+                        : "执行时间线"}
                     </h3>
                     <ol className="space-y-3 border-l-2 border-border pl-4 text-sm">
                       {[
-                        ["Received", selected.task.createdAt],
-                        ["Dispatched", selected.task.dispatchedAt],
+                        ["已接收", selected.task.createdAt],
+                        ["已派发", selected.task.dispatchedAt],
                         ["Started", selected.task.startedAt],
                         [
                           selected.status === "completed"
                             ? "Completed"
-                            : "Finished",
+                            : "已结束",
                           selected.task.completedAt,
                         ],
                       ]
@@ -652,7 +652,7 @@ export function AgentActivityPanel({
                         <span className="flex items-center justify-between gap-2">
                           <span>
                             {index === 0
-                              ? "Original attempt"
+                              ? "原始尝试"
                               : `Retry ${index}`}
                           </span>
                           <Badge tone={tone(attempt.status)}>
@@ -670,7 +670,7 @@ export function AgentActivityPanel({
                 </section>
               )}
               <section>
-                <h3 className="mb-3 text-sm font-semibold">Runtime context</h3>
+                <h3 className="mb-3 text-sm font-semibold">运行时上下文</h3>
                 <div className="space-y-2">
                   {selected.sessions.map((session) => (
                     <Link

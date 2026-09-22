@@ -51,11 +51,11 @@ import { cn } from "@/lib/utils";
 type IssueView = "all" | "active" | "review" | "done" | "archived";
 
 const issueViews: Array<{ value: IssueView; label: string }> = [
-  { value: "all", label: "All" },
-  { value: "active", label: "Active" },
-  { value: "review", label: "In review" },
-  { value: "done", label: "Done" },
-  { value: "archived", label: "Archived" },
+  { value: "all", label: "全部" },
+  { value: "active", label: "活跃" },
+  { value: "review", label: "待评审" },
+  { value: "done", label: "已完成" },
+  { value: "archived", label: "已归档" },
 ];
 
 function IssueOwnerOrTarget({ issue, identities }: { issue: Issue; identities: EntityIdentityMap }) {
@@ -65,7 +65,7 @@ function IssueOwnerOrTarget({ issue, identities }: { issue: Issue; identities: E
   if (issue.executionTargetRef) {
     return <EntityIdentityText identities={identities} type={issue.executionTargetType} entityRef={issue.executionTargetRef} secondary />;
   }
-  return <span className="text-slate-400">Unassigned</span>;
+  return <span className="text-slate-400">未分配</span>;
 }
 
 function priorityTone(priority: string): "default" | "warning" | "danger" {
@@ -174,18 +174,18 @@ export default function IssuesPage() {
   }
 
   const emptyDescription = source === "endpoint_jobs"
-    ? "No Endpoint Job has created an operational issue in this scope."
+    ? "该作用域中还没有 Endpoint 任务创建过运维 Issue。"
     : search
-      ? "Try another search or clear the active filters."
+      ? "换个搜索词，或清除当前筛选条件。"
       : view === "archived"
-        ? "Archived issues will be kept here for reference."
-        : "Create the first durable work item in this scope.";
+        ? "已归档的 Issue 会保留在此处供查阅。"
+        : "在该作用域中创建第一个持久化工作项。";
 
   return (
     <WorkPage>
       <WorkPageHeader
-        title="Issues"
-        description="Plan work, keep discussion in context, and follow every execution through review."
+        title="Issue"
+        description="规划工作、让讨论留在上下文中，并跟踪每次执行直到评审。"
         actions={
           <Button onClick={() => setParam("new", "1")}>
             <Plus className="h-4 w-4" /> New issue
@@ -218,7 +218,7 @@ export default function IssuesPage() {
               className="pl-9 shadow-none"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search issues"
+              placeholder="搜索 Issue"
             />
           </label>
           <select
@@ -227,28 +227,28 @@ export default function IssuesPage() {
             value={source}
             onChange={(event) => setParam("source", event.target.value === "all" ? undefined : event.target.value)}
           >
-            <option value="all">All sources</option>
+            <option value="all">全部来源</option>
             <option value="work">Work Hub</option>
-            <option value="endpoint_jobs">Endpoint jobs</option>
+            <option value="endpoint_jobs">Endpoint 任务</option>
           </select>
         </div>
       </div>
 
       <WorkPanel>
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3 text-xs text-slate-500">
-          <span>{issues.isLoading ? "Loading issues…" : `${items.length} issue${items.length === 1 ? "" : "s"}`}</span>
+          <span>{issues.isLoading ? "正在加载 Issue…" : `${items.length} issue${items.length === 1 ? "" : "s"}`}</span>
           <span className="hidden sm:block">Updated automatically</span>
         </div>
         {issues.isLoading ? (
           <WorkLoadingRows rows={6} />
         ) : issues.isError ? (
-          <WorkEmpty title="Issues could not be loaded" description="Check the control plane connection and try again." />
+          <WorkEmpty title="Issue 加载失败" description="请检查控制面连接后重试。" />
         ) : !items.length ? (
           <WorkEmpty
-            title={search ? "No matching issues" : "No issues here"}
+            title={search ? "没有匹配的 Issue" : "暂无 Issue"}
             description={emptyDescription}
             action={!search && source !== "endpoint_jobs" && view !== "archived" ? (
-              <Button size="sm" onClick={() => setParam("new", "1")}>Create issue</Button>
+              <Button size="sm" onClick={() => setParam("new", "1")}>创建 Issue</Button>
             ) : undefined}
           />
         ) : (
@@ -258,11 +258,11 @@ export default function IssuesPage() {
                 <thead className="border-b border-slate-100 bg-slate-50/70 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">
                   <tr>
                     <th className="px-5 py-3">Issue</th>
-                    <th className="px-4 py-3">Priority</th>
-                    <th className="px-4 py-3">Owner / target</th>
-                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">优先级</th>
+                    <th className="px-4 py-3">负责人 / 目标</th>
+                    <th className="px-4 py-3">状态</th>
                     <th className="px-4 py-3">Updated</th>
-                    <th className="w-12 px-4 py-3"><span className="sr-only">Open</span></th>
+                    <th className="w-12 px-4 py-3"><span className="sr-only">打开</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -274,7 +274,7 @@ export default function IssuesPage() {
                         </Link>
                         <div className="mt-1 flex items-center gap-2 font-mono text-[11px] text-slate-400">
                           <span>{issue.identifier || issue.id.slice(0, 8)}</span>
-                          {issue.kind === "endpoint_job" && <Badge>Endpoint job</Badge>}
+                          {issue.kind === "endpoint_job" && <Badge>Endpoint 任务</Badge>}
                         </div>
                       </td>
                       <td className="px-4 py-4"><Badge tone={priorityTone(issue.priority)} className="capitalize">{issue.priority}</Badge></td>
@@ -309,11 +309,11 @@ export default function IssuesPage() {
       <Dialog open={dialogOpen} onOpenChange={(nextOpen) => nextOpen ? setParam("new", "1") : closeCreate()}>
         <DialogContent size="md">
           <DialogHeader>
-            <DialogTitle>Create issue</DialogTitle>
-            <DialogDescription>Capture the outcome, context, and the first owner or execution Workflow for this work.</DialogDescription>
+            <DialogTitle>创建 Issue</DialogTitle>
+            <DialogDescription>记录该项工作的成果、背景，以及首个负责人或执行 Workflow。</DialogDescription>
           </DialogHeader>
           <DialogBody>
-          <label className="grid gap-2 text-sm font-medium">Sharing<select aria-label="New issue sharing" className="h-9 rounded-md border bg-white px-2" value={accessMode} onChange={e => setAccessMode(e.target.value as typeof accessMode)}><option value="private">Private — only you</option><option value="namespace">Namespace members</option></select><span className="text-xs font-normal text-muted-foreground">Includes execution records and attachments. Add individual collaborators after creating the Issue.</span></label>
+          <label className="grid gap-2 text-sm font-medium">共享<select aria-label="新 Issue 的共享范围" className="h-9 rounded-md border bg-white px-2" value={accessMode} onChange={e => setAccessMode(e.target.value as typeof accessMode)}><option value="private">私密 —— 仅自己可见</option><option value="namespace">空间成员</option></select><span className="text-xs font-normal text-muted-foreground">包含执行记录与附件。创建 Issue 后可再添加具体的协作者。</span></label>
             <form onSubmit={submit} className="space-y-5">
               <label className="block space-y-2 text-sm font-medium text-slate-700">
                 Title
@@ -321,15 +321,15 @@ export default function IssuesPage() {
               </label>
               <label className="block space-y-2 text-sm font-medium text-slate-700">
                 Description
-                <Textarea className="min-h-32" value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Add context, constraints, or acceptance notes…" />
+                <Textarea className="min-h-32" value={description} onChange={(event) => setDescription(event.target.value)} placeholder="添加背景、约束或验收说明…" />
               </label>
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block space-y-2 text-sm font-medium text-slate-700">
                   Priority
                   <select className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm" value={priority} onChange={(event) => setPriority(event.target.value)}>
-                    <option value="low">Low</option>
-                    <option value="normal">Normal</option>
-                    <option value="high">High</option>
+                    <option value="low">低</option>
+                    <option value="normal">普通</option>
+                    <option value="high">高</option>
                     <option value="urgent">Urgent</option>
                   </select>
                 </label>
@@ -339,14 +339,14 @@ export default function IssuesPage() {
                     <option value="agent">Agent</option>
                     <option value="team">Team</option>
                     <option value="workflow">Workflow</option>
-                    <option value="human">Human</option>
+                    <option value="human">人工</option>
                   </select>
                 </label>
               </div>
               <label className="block space-y-2 text-sm font-medium text-slate-700">
-                {assigneeType === "workflow" ? "Execution Workflow" : "Owner"} <span className="font-normal text-slate-400">(optional)</span>
+                {assigneeType === "workflow" ? "执行 Workflow" : "负责人"} <span className="font-normal text-slate-400">（可选）</span>
                 {assigneeType === "agent" ? (
-                  <AgentPicker value={assigneeRef} onChange={setAssigneeRef} emptyLabel="Select an Agent" aria-label="Issue assignee Agent" />
+                  <AgentPicker value={assigneeRef} onChange={setAssigneeRef} emptyLabel="选择 Agent" aria-label="Issue assignee Agent" />
                 ) : assigneeType === "team" ? (
                   <NamedResourcePicker
                     value={assigneeRef}
@@ -355,7 +355,7 @@ export default function IssuesPage() {
                     resourceLabel="Team"
                     loading={teams.isLoading}
                     error={teams.isError}
-                    emptyLabel="Select a Team"
+                    emptyLabel="选择 Team"
                     aria-label="Issue assignee Team"
                   />
                 ) : assigneeType === "workflow" ? (
@@ -366,8 +366,8 @@ export default function IssuesPage() {
                     resourceLabel="Workflow"
                     loading={workflows.isLoading}
                     error={workflows.isError}
-                    emptyLabel="Select a Workflow"
-                    aria-label="Issue execution Workflow"
+                    emptyLabel="选择 Workflow"
+                    aria-label="Issue 执行 Workflow"
                   />
                 ) : (
                   <Input value={assigneeRef} onChange={(event) => setAssigneeRef(event.target.value)} placeholder={`${assigneeType} reference`} />
@@ -378,11 +378,11 @@ export default function IssuesPage() {
                   </span>
                 )}
               </label>
-              {create.isError && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{create.error instanceof Error ? create.error.message : "Unable to create this issue. Please verify the fields and try again."}</p>}
+              {create.isError && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{create.error instanceof Error ? create.error.message : "无法创建该 Issue。请检查各字段后重试。"}</p>}
               <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
-                <Button type="button" variant="ghost" onClick={closeCreate}>Cancel</Button>
+                <Button type="button" variant="ghost" onClick={closeCreate}>取消</Button>
                 <Button type="submit" disabled={create.isPending || !title.trim()}>
-                  {create.isPending ? "Creating…" : "Create issue"}
+                  {create.isPending ? "创建中…" : "Create issue"}
                 </Button>
               </div>
             </form>

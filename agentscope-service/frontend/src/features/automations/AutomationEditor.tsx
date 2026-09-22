@@ -79,7 +79,7 @@ function TriggerEditor({
           <Webhook className="h-4 w-4" />
         )}
         <span className="flex-1 text-sm font-medium">
-          {trigger.type === "cron" ? "Schedule" : "Webhook"}
+          {trigger.type === "cron" ? "定时" : "Webhook"}
         </span>
         <label className="flex items-center gap-1 text-xs">
           <input
@@ -95,7 +95,7 @@ function TriggerEditor({
           type="button"
           variant="ghost"
           size="sm"
-          aria-label="Remove trigger"
+          aria-label="移除触发器"
           onClick={onRemove}
         >
           <Trash2 className="h-3.5 w-3.5" />
@@ -106,7 +106,7 @@ function TriggerEditor({
           <label className="block space-y-1 text-xs">
             Frequency
             <select
-              aria-label="Schedule preset"
+              aria-label="定时预设"
               className={selectClass}
               value={
                 [
@@ -123,17 +123,17 @@ function TriggerEditor({
                   onChange({ ...trigger, schedule: e.target.value });
               }}
             >
-              <option value="0 9 * * 1-5">Weekdays at 09:00</option>
-              <option value="0 9 * * *">Every day at 09:00</option>
-              <option value="0 * * * *">Every hour</option>
-              <option value="*/30 * * * *">Every 30 minutes</option>
-              <option value="custom">Custom schedule</option>
+              <option value="0 9 * * 1-5">工作日 09:00</option>
+              <option value="0 9 * * *">每天 09:00</option>
+              <option value="0 * * * *">每小时</option>
+              <option value="*/30 * * * *">每 30 分钟</option>
+              <option value="custom">自定义定时</option>
             </select>
           </label>
           <label className="block space-y-1 text-xs">
             Cron expression
             <Input
-              aria-label="Cron expression"
+              aria-label="Cron 表达式"
               value={trigger.schedule || ""}
               onChange={(e) =>
                 onChange({ ...trigger, schedule: e.target.value })
@@ -145,7 +145,7 @@ function TriggerEditor({
           <label className="block space-y-1 text-xs">
             Time zone
             <Input
-              aria-label="Time zone"
+              aria-label="时区"
               list={timezoneList}
               value={trigger.timezone || ""}
               onChange={(e) =>
@@ -165,14 +165,14 @@ function TriggerEditor({
             aria-live="polite"
           >
             {preview.isFetching ? (
-              "Checking next runs…"
+              "正在检查后续运行…"
             ) : preview.error ? (
               <span className="text-red-600">
                 {automationError(preview.error)}
               </span>
             ) : (
               <>
-                <p className="mb-1 font-medium">Next runs</p>
+                <p className="mb-1 font-medium">后续运行</p>
                 {preview.data?.nextRuns.slice(0, 3).map((date) => (
                   <div key={date}>
                     {new Date(date).toLocaleString(undefined, {
@@ -190,7 +190,7 @@ function TriggerEditor({
           <label className="block space-y-1 text-xs">
             Events to accept
             <Input
-              aria-label="Webhook event filters"
+              aria-label="Webhook 事件筛选"
               value={trigger.events?.join(", ") || ""}
               onChange={(e) =>
                 onChange({
@@ -259,7 +259,7 @@ export function AutomationEditor({
           const url = new URL(link);
           if (!["http:", "https:"].includes(url.protocol)) throw new Error();
         } catch {
-          throw new Error("Context links must start with https:// or http://.");
+          throw new Error("上下文链接必须以 https:// 或 http:// 开头。");
         }
       }
       const retained = (execution.contextRefs || []).filter(
@@ -298,7 +298,7 @@ export function AutomationEditor({
       <DialogContent size="xl">
         <DialogHeader>
           <DialogTitle>
-            {rule ? "Edit automation" : "New automation"}
+            {rule ? "编辑 Automation" : "新建 Automation"}
           </DialogTitle>
           <DialogDescription>
             Give an Agent or Team a repeatable task.
@@ -316,7 +316,7 @@ export function AutomationEditor({
                 <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Daily engineering digest"
+                  placeholder="每日工程摘要"
                   required
                   autoFocus
                   maxLength={200}
@@ -343,28 +343,28 @@ export function AutomationEditor({
               </label>
               <label className="block space-y-2 text-sm font-medium">
                 Description{" "}
-                <span className="font-normal text-slate-400">(optional)</span>
+                <span className="font-normal text-slate-400">（可选）</span>
                 <Input
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="A short description for the automation list"
+                  placeholder="用于 Automation 列表的简短描述"
                 />
               </label>
               <label className="block space-y-2 text-sm font-medium">
                 Context links{" "}
-                <span className="font-normal text-slate-400">(optional)</span>
+                <span className="font-normal text-slate-400">（可选）</span>
                 <Textarea
                   value={contextLinks}
                   onChange={(e) => setContextLinks(e.target.value)}
-                  placeholder="One project or document link per line"
+                  placeholder="每行一个项目或文档链接"
                 />
               </label>
             </div>
             <div className="space-y-6 p-6 lg:overflow-y-auto">
               <fieldset className="space-y-2">
-                <legend className="mb-2 text-sm font-medium">Assignee</legend>
+                <legend className="mb-2 text-sm font-medium">负责人</legend>
                 <select
-                  aria-label="Assignee type"
+                  aria-label="负责人类型"
                   className={selectClass}
                   value={execution.assigneeType}
                   onChange={(e) =>
@@ -399,7 +399,7 @@ export function AutomationEditor({
                       })
                     }
                   >
-                    <option value="">Select Team…</option>
+                    <option value="">选择 Team…</option>
                     {teams.data?.items
                       .filter(
                         (team) =>
@@ -426,13 +426,13 @@ export function AutomationEditor({
                   [
                     {
                       value: "create_issue",
-                      title: "Create issue",
-                      detail: "Track, discuss and review each result.",
+                      title: "创建 Issue",
+                      detail: "跟踪、讨论并评审每个结果。",
                     },
                     {
                       value: "run_only",
-                      title: "Run only",
-                      detail: "View results in automation history.",
+                      title: "仅运行",
+                      detail: "在 Automation 历史中查看结果。",
                     },
                   ] as const
                 ).map((mode) => (
@@ -463,7 +463,7 @@ export function AutomationEditor({
                 <label className="block space-y-2 text-sm font-medium">
                   Completion
                   <select
-                    aria-label="Completion policy"
+                    aria-label="完成策略"
                     className={selectClass}
                     value={execution.completionPolicy}
                     onChange={(e) =>
@@ -475,7 +475,7 @@ export function AutomationEditor({
                       })
                     }
                   >
-                    <option value="review">Require human review</option>
+                    <option value="review">需要人工审核</option>
                     <option value="automatic">
                       Complete when the work finishes
                     </option>
@@ -504,7 +504,7 @@ export function AutomationEditor({
                 </label>
               )}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium">Triggers</h3>
+                <h3 className="text-sm font-medium">触发器</h3>
                 {triggers.length === 0 && (
                   <p className="text-sm text-slate-500">
                     Manual runs only. Add a trigger to run automatically.
@@ -573,7 +573,7 @@ export function AutomationEditor({
                     <option value="skip">
                       Skip while a previous execution is active
                     </option>
-                    <option value="queue">Queue and execute in order</option>
+                    <option value="queue">按顺序排队执行</option>
                   </select>
                 </label>
                 <label className="block space-y-1">
@@ -637,10 +637,10 @@ export function AutomationEditor({
               }
             >
               {save.isPending
-                ? "Saving…"
+                ? "保存中…"
                 : rule
-                  ? "Save changes"
-                  : "Create automation"}
+                  ? "保存变更"
+                  : "创建 Automation"}
             </Button>
           </div>
         </div>

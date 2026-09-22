@@ -50,20 +50,20 @@ function renderList(roles: string[], empty: boolean, loginRoles: string[] = ['us
 
 describe('Workflow creation entry uses namespace permissions', () => {
   it.each(['admin', 'developer'])('offers creation for namespace %s', (role) => {
-    expect(renderList([role], false)).toContain('Create Workflow</button>');
-    expect(renderList([role], true).match(/Create Workflow<\/button>/g)).toHaveLength(2);
+    expect(renderList([role], false)).toContain('创建 Workflow</button>');
+    expect(renderList([role], true).match(/创建 Workflow<\/button>/g)).toHaveLength(2);
   });
 
   it.each(['viewer', 'member', 'operator', 'auditor', 'agent_developer'])(
     'does not grant definition management to namespace %s based on the login role', (role) => {
-      expect(renderList([role], false, ['admin'])).not.toContain('Create Workflow</button>');
+      expect(renderList([role], false, ['admin'])).not.toContain('创建 Workflow</button>');
       const empty = renderList([role], true, ['admin']);
-      expect(empty).not.toContain('Create Workflow</button>');
-      expect(empty).toContain('No workflows are available in this namespace yet.');
+      expect(empty).not.toContain('创建 Workflow</button>');
+      expect(empty).toContain('该空间中尚无可用 Workflow。');
     },
   );
 
   it('does not offer creation before authorized scope is available', () => {
-    expect(renderList([], true)).not.toContain('Create Workflow</button>');
+    expect(renderList([], true)).not.toContain('创建 Workflow</button>');
   });
 });
