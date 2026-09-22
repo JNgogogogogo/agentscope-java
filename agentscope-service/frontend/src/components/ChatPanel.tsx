@@ -714,7 +714,7 @@ export default function ChatPanel({
           {loadError}
           {!embedded && (
             <div style={{ marginTop: 16, display: 'flex', gap: 12, justifyContent: 'center' }}>
-              <Link to="/managed/sessions" style={{ ...S.iconBtn, color: '#6366f1' }}>Conversations</Link>
+              <Link to="/managed/sessions" style={{ ...S.iconBtn, color: '#6366f1' }}>对话列表</Link>
               <Link
                 to={`/managed/sessions/new?agentId=${encodeURIComponent(agentId)}`}
                 style={{ ...S.iconBtn, color: '#6366f1' }}
@@ -739,7 +739,7 @@ export default function ChatPanel({
           <Link
             to={`/managed/sessions/${encodeURIComponent(sessionId)}?tab=details`}
             style={{ ...S.iconBtn, maxWidth: 320, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-            title="View / edit mounts on Details"
+            title="在详情中查看/编辑挂载"
           >
             {mountLabel}
           </Link>
@@ -750,7 +750,7 @@ export default function ChatPanel({
             <Link
               to={`/managed/sessions/${encodeURIComponent(sessionId)}?tab=details`}
               style={S.iconBtn}
-              title="Session details and event timeline"
+              title="Session 详情与事件时间线"
             >
               📊 Details
             </Link>
@@ -766,7 +766,7 @@ export default function ChatPanel({
           <Link
             to={`/managed/sessions/${encodeURIComponent(sessionId)}`}
             style={S.iconBtn}
-            title="Open full session page"
+            title="打开完整 Session 页面"
           >
             Full page
           </Link>
@@ -787,7 +787,7 @@ export default function ChatPanel({
         accessory={pendingConfirm && !readOnly ? (
           <div style={S.confirmCard}>
             <div style={{ fontWeight: 700, color: '#92400e', marginBottom: 8 }}>
-              Allow tool call: {pendingConfirm.toolName}?
+              允许工具调用：{pendingConfirm.toolName}?
             </div>
             {pendingConfirm.input && (
               <pre style={{
@@ -799,7 +799,7 @@ export default function ChatPanel({
             )}
             <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
               <button type="button" style={S.allowBtn} onClick={() => handleConfirmation(true)} disabled={busy}>Allow</button>
-              <button type="button" style={S.denyBtn} onClick={() => handleConfirmation(false)} disabled={busy}>Deny</button>
+              <button type="button" style={S.denyBtn} onClick={() => handleConfirmation(false)} disabled={busy}>拒绝</button>
             </div>
           </div>
         ) : undefined}

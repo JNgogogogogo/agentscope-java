@@ -95,7 +95,7 @@ function describe(b: BindingConfigEntry): string {
   if (b.roles && b.roles.length) parts.push(`roles=${b.roles.join('|')}`);
   if (b.team) parts.push(`platformTeam=${b.team}`);
   if (b.account) parts.push(`account=${b.account}`);
-  return parts.join(', ') || '(catch-all)';
+  return parts.join(', ') || '（兜底）';
 }
 
 interface BindingForm {
@@ -185,7 +185,7 @@ export default function ChannelDetailPage() {
 
   function onTypeChange(next: string) {
     if (next === type) return;
-    if (!confirm('Switching platform clears the credential form. Continue?')) return;
+    if (!confirm('切换平台会清空凭据表单。是否继续？')) return;
     setType(next);
     const spec = types.find((t) => t.type === next);
     setCreds(credentialsFromProperties(spec, undefined));
@@ -211,7 +211,7 @@ export default function ChannelDetailPage() {
       setBindings(updated.bindings ?? []);
       const spec = types.find((x) => x.type === updated.type);
       setCreds(credentialsFromProperties(spec, updated.properties));
-      setInfo('Saved. Scheduler will pick up changes on the next refresh.');
+      setInfo('已保存。Scheduler 会在下次刷新时应用变更。');
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : String(e));
     }
@@ -229,7 +229,7 @@ export default function ChannelDetailPage() {
   }
 
   async function handleDeleteChannel() {
-    if (!confirm(`Delete channel '${channelId}'? This removes its entry and all bindings.`)) return;
+    if (!confirm(`删除 Channel '${channelId}'？此操作会移除其条目和所有绑定。`)) return;
     try {
       await deleteChannel(channelId);
       navigate('/agent-center/entrypoints');
@@ -250,7 +250,7 @@ export default function ChannelDetailPage() {
 
   async function saveBinding() {
     if (editForm == null || editIdx == null) return;
-    if (!editForm.agentId.trim()) { setErr('agentId is required'); return; }
+    if (!editForm.agentId.trim()) { setErr('agentId 为必填项'); return; }
     const next = [...bindings];
     const entry = formToBinding(editForm);
     if (editIdx >= bindings.length) next.push(entry);
@@ -279,12 +279,12 @@ export default function ChannelDetailPage() {
   }
 
   if (!detail && !err) {
-    return <div className="console-page-legacy" style={S.root}>Loading…</div>;
+    return <div className="console-page-legacy" style={S.root}>加载中…</div>;
   }
 
   return (
     <div className="console-page-legacy" style={S.root}>
-      <button style={S.backLink} onClick={() => navigate('/agent-center/entrypoints')}>← All channels</button>
+      <button style={S.backLink} onClick={() => navigate('/agent-center/entrypoints')}>← 全部 Channel</button>
       <h1 style={S.title}>{channelId}</h1>
       <div style={S.subtle}>连接平台、配置工作接待，并按已授权的工作关联回传消息。</div>
 
@@ -309,28 +309,28 @@ export default function ChannelDetailPage() {
             </div>
             <div style={S.grid2}>
               <div>
-                <label style={S.field}>Platform</label>
+                <label style={S.field}>平台</label>
                 <select style={S.input} value={type} onChange={e => onTypeChange(e.target.value)}>
                   {types.map(t => <option key={t.type} value={t.type}>{t.label}</option>)}
                 </select>
               </div>
               <div>
-                <label style={S.field}>Conversation isolation</label>
+                <label style={S.field}>会话隔离</label>
                 <select style={S.input} value={dmScope} onChange={e => setDmScope(e.target.value)}>
                   {DM_SCOPES.map(s => (
                     <option key={s} value={s}>
-                      {s === 'PER_PEER' ? 'Per person (PER_PEER)' : 'Shared inbox (MAIN)'}
+                      {s === 'PER_PEER' ? '每人独立（PER_PEER）' : '共享收件箱（MAIN）'}
                     </option>
                   ))}
                 </select>
               </div>
               <div style={{ gridColumn: '1 / span 2' }}>
                 <label style={S.field}>普通私聊默认 Agent</label>
-                <AgentPicker value={defaultAgentId} onChange={setDefaultAgentId} aria-label="Channel default Agent" />
+                <AgentPicker value={defaultAgentId} onChange={setDefaultAgentId} aria-label="Channel 默认 Agent" />
               </div>
             </div>
             <div style={{ marginTop: 18 }}>
-              <h3 style={{ ...S.sectionTitle, fontSize: '0.95rem', marginBottom: 10 }}>Credentials</h3>
+              <h3 style={{ ...S.sectionTitle, fontSize: '0.95rem', marginBottom: 10 }}>凭据</h3>
               <PlatformCredentialsForm
                 spec={typeSpec}
                 values={creds}
@@ -341,29 +341,29 @@ export default function ChannelDetailPage() {
             </div>
             {callbackUrl ? (
               <div style={S.callout}>
-                <strong>Callback / webhook URL</strong>
+                <strong>回调 / webhook 地址</strong>
                 <div style={{ fontFamily: 'monospace', marginTop: 6, wordBreak: 'break-all' }}>{callbackUrl}</div>
-                <div style={{ ...S.subtle, marginTop: 6 }}>Paste this into the platform developer console.</div>
+                <div style={{ ...S.subtle, marginTop: 6 }}>粘贴到平台开发者控制台。</div>
               </div>
             ) : null}
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
-              <button style={{ ...S.btn, ...S.btnPrimary }} onClick={() => persist()}>Save configuration</button>
+              <button style={{ ...S.btn, ...S.btnPrimary }} onClick={() => persist()}>保存配置</button>
             </div>
           </div>
 
           <div style={S.section}>
             <div style={S.sectionHead}>
-              <h2 style={S.sectionTitle}>Transfer rules</h2>
+              <h2 style={S.sectionTitle}>转接规则</h2>
               <span style={S.subtle}>({bindings.length})</span>
               <span style={{ flex: 1 }} />
-              <button style={{ ...S.btn, ...S.btnPrimary }} onClick={startAddBinding}>+ Add rule</button>
+              <button style={{ ...S.btn, ...S.btnPrimary }} onClick={startAddBinding}>+ 添加规则</button>
             </div>
             <div style={{ ...S.subtle, marginBottom: 12 }}>
               Route specific peers / groups to another agent. Leave selectors blank for catch-all.
             </div>
             {bindings.length === 0 ? (
               <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-                No rules. Inbound messages route to <code>defaultAgentId</code>.
+                暂无规则。收到的消息会路由到 <code>defaultAgentId</code>。
               </div>
             ) : bindings.map((b, i) => (
               <div key={i} style={S.bindingRow}>
@@ -374,11 +374,11 @@ export default function ChannelDetailPage() {
                   {describe(b)}
                 </span>
                 {b.sessionScope && <span style={S.badge}>{b.sessionScope}</span>}
-                <button style={S.btn} onClick={() => startEditBinding(i)}>Edit</button>
+                <button style={S.btn} onClick={() => startEditBinding(i)}>编辑</button>
                 <button
                   style={{ ...S.btn, color: '#dc2626', borderColor: '#fca5a5' }}
                   onClick={() => deleteBindingAt(i)}
-                >Delete</button>
+                >删除</button>
               </div>
             ))}
           </div>
@@ -422,7 +422,7 @@ function BindingDialog({ form, isNew, onChange, onCancel, onSave }: DialogProps)
     <div style={scrim} onClick={onCancel}>
       <div style={modal} onClick={e => e.stopPropagation()}>
         <h3 style={{ margin: '0 0 16px', fontSize: '1.15rem', color: '#0f172a', fontWeight: 700 }}>
-          {isNew ? 'Add transfer rule' : 'Edit transfer rule'}
+          {isNew ? '添加转接规则' : '编辑转接规则'}
         </h3>
         <p style={{ ...S.subtle, margin: '0 0 14px' }}>
           Fill the most-specific selector (e.g. a DingTalk staff id as peer). Leave others blank.
@@ -430,27 +430,27 @@ function BindingDialog({ form, isNew, onChange, onCancel, onSave }: DialogProps)
 
         <div style={S.grid2}>
           <div>
-            <label style={S.field}>Hand off to agent</label>
+            <label style={S.field}>转交给 Agent</label>
             <AgentPicker
               value={form.agentId}
               onChange={agentId => onChange({ ...form, agentId })}
               required
-              aria-label="Transfer target Agent"
+              aria-label="转接目标 Agent"
             />
           </div>
           <div>
-            <label style={S.field}>Isolation override</label>
+            <label style={S.field}>隔离覆盖</label>
             <select
               style={S.input}
               value={form.sessionScope}
               onChange={e => onChange({ ...form, sessionScope: e.target.value })}
             >
-              <option value="">— inherit channel —</option>
+              <option value="">— 继承 Channel 设置 —</option>
               {DM_SCOPES.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
           <div>
-            <label style={S.field}>peer (e.g. direct:staffId)</label>
+            <label style={S.field}>peer（例如 direct:staffId）</label>
             <input style={S.input} value={form.peer} onChange={e => onChange({ ...form, peer: e.target.value })} />
           </div>
           <div>
@@ -462,7 +462,7 @@ function BindingDialog({ form, isNew, onChange, onCancel, onSave }: DialogProps)
             <input style={S.input} value={form.guild} onChange={e => onChange({ ...form, guild: e.target.value })} />
           </div>
           <div>
-            <label style={S.field}>roles (comma-separated)</label>
+            <label style={S.field}>roles（逗号分隔）</label>
             <input style={S.input} value={form.roles} onChange={e => onChange({ ...form, roles: e.target.value })} />
           </div>
           <div>
@@ -476,7 +476,7 @@ function BindingDialog({ form, isNew, onChange, onCancel, onSave }: DialogProps)
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 24 }}>
-          <button style={S.btn} onClick={onCancel}>Cancel</button>
+          <button style={S.btn} onClick={onCancel}>取消</button>
           <button style={{ ...S.btn, ...S.btnPrimary }} onClick={onSave}>{isNew ? 'Create' : 'Save'}</button>
         </div>
       </div>

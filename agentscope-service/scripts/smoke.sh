@@ -44,7 +44,7 @@ OWNER_ID="$(printf '%s' "$ME" | json_path userId)"
 
 echo "==> create Managed Agent"
 AGENT="$(curl -sf -X POST "$BASE/api/agents" -H "$AUTH" -H 'Content-Type: application/json' \
-  -d "{\"name\":\"smoke-agent-${SMOKE_ID}\",\"system\":\"You are a concise assistant.\",\"model\":\"qwen-plus\"}")"
+  -d "{\"name\":\"smoke-agent-${SMOKE_ID}\",\"system\":\"You are a concise assistant.\",\"model\":\"qwen3.8-27b\"}")"
 AGENT_ID="$(printf '%s' "$AGENT" | json_path id)"
 echo "  agent=$AGENT_ID"
 

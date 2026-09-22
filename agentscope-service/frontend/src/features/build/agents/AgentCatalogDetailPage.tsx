@@ -129,14 +129,14 @@ function InstanceCard({ instance }: { instance: CatalogAgentInstance }) {
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
         <div>
-          <span className="text-muted-foreground">Load</span>
+          <span className="text-muted-foreground">加载</span>
           <div className="mt-0.5 font-medium">
             {instance.activeSessions}/
             {instance.capacity <= 0 ? "∞" : instance.capacity}
           </div>
         </div>
         <div>
-          <span className="text-muted-foreground">Last seen</span>
+          <span className="text-muted-foreground">最近活跃</span>
           <div className="mt-0.5 font-medium">
             {formatRelative(instance.lastSeenAt)}
           </div>
@@ -269,14 +269,14 @@ export default function AgentCatalogDetailPage() {
     return (
       <Page>
         <EmptyState
-          title="Agent unavailable"
+          title="Agent 不可用"
           description={
             agent.error instanceof Error
               ? agent.error.message
               : "Unable to load this Agent."
           }
         />
-        <Button onClick={() => void agent.refetch()}>Retry</Button>
+        <Button onClick={() => void agent.refetch()}>重试</Button>
       </Page>
     );
   if (
@@ -336,15 +336,15 @@ export default function AgentCatalogDetailPage() {
                 <span>{value.status}</span>
                 <span>{value.agentKey}</span>
                 <button
-                  title="Copy Agent ID"
-                  aria-label="Copy Agent ID"
+                  title="复制 Agent ID"
+                  aria-label="复制 Agent ID"
                   className="inline-flex items-center gap-1 hover:text-primary"
                   onClick={async () => {
                     try {
                       await navigator.clipboard.writeText(value.id);
-                      setCopyStatus("ID copied");
+                      setCopyStatus("ID 已复制");
                     } catch {
-                      setCopyStatus("Copy unavailable");
+                      setCopyStatus("无法复制");
                     }
                   }}
                 >
@@ -379,12 +379,12 @@ export default function AgentCatalogDetailPage() {
             )}
             <Button
               variant="outline"
-              aria-label="Refresh Agent"
-              title="Refresh current data"
+              aria-label="刷新 Agent"
+              title="刷新当前数据"
               onClick={() => void refresh()}
             >
               <RefreshCw className="h-4 w-4" />
-              <span className="hidden sm:inline">Refresh</span>
+              <span className="hidden sm:inline">刷新</span>
             </Button>
           </div>
         </div>
@@ -395,7 +395,7 @@ export default function AgentCatalogDetailPage() {
         )}
       </header>
       <nav
-        aria-label="Agent detail"
+        aria-label="Agent 详情"
         className="flex gap-1 overflow-x-auto border-b border-border"
       >
         {agentDetailTabs(runtimeKind).map((item) => (
@@ -450,7 +450,7 @@ export default function AgentCatalogDetailPage() {
               {runtimeKind === "managed" && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Agent definition</CardTitle>
+                    <CardTitle>Agent 定义</CardTitle>
                     <CardDescription>
                       Version {value.version ?? "—"}
                     </CardDescription>
@@ -467,7 +467,7 @@ export default function AgentCatalogDetailPage() {
                       <p className="mt-1">
                         {value.workspaceId
                           ? "Linked workspace"
-                          : "Agent workspace"}
+                          : "Agent 工作区"}
                       </p>
                     </div>
                     <div className="flex gap-4">
@@ -490,11 +490,11 @@ export default function AgentCatalogDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
                   <div className="flex justify-between gap-2">
-                    <span className="text-muted-foreground">Availability</span>
+                    <span className="text-muted-foreground">可用性</span>
                     <span>{currentOverview?.readiness.state || "Unknown"}</span>
                   </div>
                   <div className="flex justify-between gap-2">
-                    <span className="text-muted-foreground">Execution</span>
+                    <span className="text-muted-foreground">执行</span>
                     <span>
                       {currentOverview?.readiness.mode === "on-demand"
                         ? "On demand"
@@ -520,14 +520,14 @@ export default function AgentCatalogDetailPage() {
               </Card>
               <Card>
                 <CardHeader>
-                  <CardTitle>Usage · 24h</CardTitle>
+                  <CardTitle>用量 · 24h</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Tokens</span>
+                    <span className="text-muted-foreground">Token 数</span>
                     <span>
                       {currentOverview?.usage.totalTokens == null
-                        ? "Not reported"
+                        ? "未上报"
                         : currentOverview.usage.totalTokens.toLocaleString()}
                     </span>
                   </div>
@@ -536,7 +536,7 @@ export default function AgentCatalogDetailPage() {
                       Reported errors
                     </span>
                     <span>
-                      {currentOverview?.usage.errorCount ?? "Not reported"}
+                      {currentOverview?.usage.errorCount ?? "未上报"}
                     </span>
                   </div>
                 </CardContent>
@@ -596,7 +596,7 @@ export default function AgentCatalogDetailPage() {
       {tab === "runtime" && (
         <section className="grid gap-5 border-t pt-5">
           <div>
-            <h2 className="text-lg font-semibold">Runtime configuration</h2>
+            <h2 className="text-lg font-semibold">运行时配置</h2>
             <RuntimeWorkspacesPanel agent={value} />
             <p className="mt-1 text-sm text-muted-foreground">
               Execution environment, availability and runtime connections.
@@ -657,14 +657,14 @@ export default function AgentCatalogDetailPage() {
                           <div className="mt-1 font-mono text-xs">
                             {String(
                               configuration.managedDefinitionRef ??
-                                "Not configured",
+                                "未配置",
                             )}
                           </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Owner</span>
+                          <span className="text-muted-foreground">所有者</span>
                           <div className="mt-1">
-                            {String(configuration.ownerRef ?? "Not configured")}
+                            {String(configuration.ownerRef ?? "未配置")}
                           </div>
                         </div>
                         {canEdit && (
@@ -803,7 +803,7 @@ export default function AgentCatalogDetailPage() {
         canEdit && (
           <Card>
             <CardHeader>
-              <CardTitle>Registration credential</CardTitle>
+              <CardTitle>注册凭据</CardTitle>
               <CardDescription>
                 Authenticate external application instances when they register.
               </CardDescription>

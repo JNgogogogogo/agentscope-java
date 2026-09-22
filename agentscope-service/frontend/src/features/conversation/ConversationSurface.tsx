@@ -99,12 +99,12 @@ function ToolBlock({ block }: { block: ConversationContentBlock }) {
         <div className="grid gap-3 border-t border-border p-3">
           {(block.text || block.data != null) && (
             <section className="min-w-0">
-              <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Input</div>
+              <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">输入</div>
               <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-slate-950 p-3 font-mono text-xs text-slate-100">{pretty(block.text || block.data)}</pre>
             </section>
           )}
           <section className="min-w-0">
-            <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Output</div>
+            <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">输出</div>
             {block.result !== undefined ? <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-slate-950 p-3 font-mono text-xs text-slate-100">{pretty(block.result) || '(Empty result)'}</pre> : <p className="text-sm text-muted-foreground">{block.toolState === 'unavailable' ? 'No result is present in the loaded history.' : 'Waiting for result…'}</p>}
           </section>
           <div className="break-all text-xs text-muted-foreground">{block.eventSeq != null && `Events #${block.eventSeq}${block.resultSeq != null ? ` → #${block.resultSeq}` : ''}`}{block.callId && <div>Call ID: <code>{block.callId}</code></div>}</div>
@@ -117,7 +117,7 @@ function ToolBlock({ block }: { block: ConversationContentBlock }) {
 function ProcessBlock({ block }: { block: ConversationContentBlock }) {
   const thinking = block.kind === 'thinking';
   if (!thinking) return <div className="flex items-center gap-2 py-1 text-xs text-muted-foreground"><Clock className="h-3.5 w-3.5" /><span>{block.toolState === 'running' ? 'Requesting model…' : block.toolState === 'unavailable' ? 'Model request · end not recorded' : 'Model request finished'}</span>{block.durationMs != null && <span>· {durationLabel(block.durationMs)}</span>}</div>;
-  return <details className="rounded-lg border border-violet-200 bg-violet-50/40 text-sm"><summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2.5 text-violet-700"><Brain className="h-4 w-4" /><span className="font-medium">Thinking</span><ChevronDown className="ml-auto h-3.5 w-3.5" /></summary><div className="md-text max-h-80 overflow-auto border-t border-violet-100 px-4 py-3 leading-6 text-slate-600"><ReactMarkdown>{block.text || 'No thinking text was recorded.'}</ReactMarkdown></div></details>;
+  return <details className="rounded-lg border border-violet-200 bg-violet-50/40 text-sm"><summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2.5 text-violet-700"><Brain className="h-4 w-4" /><span className="font-medium">思考过程</span><ChevronDown className="ml-auto h-3.5 w-3.5" /></summary><div className="md-text max-h-80 overflow-auto border-t border-violet-100 px-4 py-3 leading-6 text-slate-600"><ReactMarkdown>{block.text || '未记录思考内容。'}</ReactMarkdown></div></details>;
 }
 
 function MessageRow({ message }: { message: ConversationMessage }) {
@@ -177,13 +177,13 @@ function EventRow({ event }: { event: ConversationEvent }) {
         {open && <div className="space-y-3 border-t border-border px-4 py-3 text-sm">
           {(event.tokensIn != null || event.tokensOut != null) && <p className="text-xs text-muted-foreground">Tokens · input {event.tokensIn ?? '—'} · output {event.tokensOut ?? '—'}</p>}
           {content && <pre className="max-h-60 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-muted/50 p-3 text-sm">{pretty(content)}</pre>}
-          {raw.toolInput != null && <details><summary className="cursor-pointer font-medium">Tool input</summary><pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-muted p-3 text-xs">{pretty(raw.toolInput)}</pre></details>}
+          {raw.toolInput != null && <details><summary className="cursor-pointer font-medium">工具输入</summary><pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-lg bg-muted p-3 text-xs">{pretty(raw.toolInput)}</pre></details>}
           <details>
-            <summary className="cursor-pointer text-xs text-muted-foreground">Diagnostic details</summary>
+            <summary className="cursor-pointer text-xs text-muted-foreground">诊断详情</summary>
             <div className="mt-3 space-y-3">
               <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground"><code>{event.type}</code>{event.seq != null && <span>Event #{event.seq}</span>}</div>
               <dl className="space-y-2">{[...info.relations, ...info.diagnostics].map(item => <div key={item.label} className="grid gap-1 sm:grid-cols-[9rem_1fr]"><dt className="text-xs text-muted-foreground" title={item.description}>{item.label}</dt><dd className="min-w-0 break-all font-mono text-xs">{item.href ? <Link className="text-indigo-600 hover:underline" to={item.href}>{item.value} ↗</Link> : item.value}</dd></div>)}</dl>
-              <details><summary className="cursor-pointer text-xs text-muted-foreground">Original JSON</summary><pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap break-all rounded-lg bg-slate-950 p-3 font-mono text-xs text-slate-100">{pretty(event.payload)}</pre></details>
+              <details><summary className="cursor-pointer text-xs text-muted-foreground">原始 JSON</summary><pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap break-all rounded-lg bg-slate-950 p-3 font-mono text-xs text-slate-100">{pretty(event.payload)}</pre></details>
             </div>
           </details>
         </div>}
@@ -238,7 +238,7 @@ export function ConversationSurface({
         {headerActions}
       </header>
 
-      {view === 'events' && <div className="flex flex-wrap items-center gap-3 border-b border-border px-4 py-2 text-xs text-muted-foreground"><label className="flex items-center gap-2">Show <select aria-label="Filter events" className="rounded-md border border-border bg-background px-2 py-1.5 text-foreground" value={filter} onChange={e => setFilter(e.target.value)}>{['all', 'message', 'model', 'tool', 'turn', 'lifecycle', 'error', 'other'].map(value => <option key={value} value={value}>{value === 'all' ? 'All events' : value}</option>)}</select></label><span>{eventList.length} / {events.length}</span></div>}
+      {view === 'events' && <div className="flex flex-wrap items-center gap-3 border-b border-border px-4 py-2 text-xs text-muted-foreground"><label className="flex items-center gap-2">显示 <select aria-label="筛选事件" className="rounded-md border border-border bg-background px-2 py-1.5 text-foreground" value={filter} onChange={e => setFilter(e.target.value)}>{['all', 'message', 'model', 'tool', 'turn', 'lifecycle', 'error', 'other'].map(value => <option key={value} value={value}>{value === 'all' ? '全部事件' : value}</option>)}</select></label><span>{eventList.length} / {events.length}</span></div>}
       {error && <div className="border-b border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">{error}</div>}
 
       <div
@@ -252,13 +252,13 @@ export function ConversationSurface({
         {view === 'conversation' ? (
           <div className="mx-auto max-w-4xl space-y-4">
             {hasEarlierMessages && <div className="text-center"><Button type="button" size="sm" variant="outline" disabled={loadingEarlierMessages} onClick={onLoadEarlierMessages}>{loadingEarlierMessages ? 'Loading…' : 'Load earlier messages'}</Button></div>}
-            {loading && messages.length === 0 ? <p className="py-16 text-center text-sm text-muted-foreground">Loading conversation…</p> : messages.length === 0 ? <p className="py-16 text-center text-sm text-muted-foreground">{emptyMessage}</p> : messages.map((message) => <MessageRow key={message.id} message={message} />)}
+            {loading && messages.length === 0 ? <p className="py-16 text-center text-sm text-muted-foreground">正在加载对话…</p> : messages.length === 0 ? <p className="py-16 text-center text-sm text-muted-foreground">{emptyMessage}</p> : messages.map((message) => <MessageRow key={message.id} message={message} />)}
             {accessory}
           </div>
         ) : (
           <div className="relative mx-auto max-w-5xl space-y-2 before:absolute before:bottom-4 before:left-3 before:top-4 before:w-px before:bg-border">
             {hasEarlierEvents && <div className="relative z-10 pb-2 text-center"><Button type="button" size="sm" variant="outline" disabled={loadingEarlierEvents} onClick={onLoadEarlierEvents}>{loadingEarlierEvents ? 'Loading…' : 'Load earlier events'}</Button></div>}
-            {loading && eventList.length === 0 ? <p className="relative py-16 text-center text-sm text-muted-foreground">Loading events…</p> : eventList.length === 0 ? <p className="relative py-16 text-center text-sm text-muted-foreground">No events recorded.</p> : eventList.map((event) => <EventRow key={event.id} event={event} />)}
+            {loading && eventList.length === 0 ? <p className="relative py-16 text-center text-sm text-muted-foreground">正在加载事件…</p> : eventList.length === 0 ? <p className="relative py-16 text-center text-sm text-muted-foreground">未记录任何事件。</p> : eventList.map((event) => <EventRow key={event.id} event={event} />)}
           </div>
         )}
       </div>
@@ -283,9 +283,9 @@ export function ConversationSurface({
               }
             }}
             disabled={composer.disabled || composer.busy}
-            placeholder={composer.placeholder || 'Send a message…'}
+            placeholder={composer.placeholder || '发送消息…'}
           />
-          <Button type="submit" size="icon" disabled={!canSubmit} aria-label="Send message"><Send className="h-4 w-4" /></Button>
+          <Button type="submit" size="icon" disabled={!canSubmit} aria-label="发送消息"><Send className="h-4 w-4" /></Button>
         </form>
       )}
     </section>

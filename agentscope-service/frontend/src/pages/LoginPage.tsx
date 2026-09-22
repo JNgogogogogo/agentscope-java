@@ -98,7 +98,7 @@ export default function LoginPage() {
       saveToken(res.token);
       navigate('/control/overview', { replace: true });
     } catch {
-      setError('Invalid username or password');
+      setError('用户名或密码错误');
     } finally {
       setLoading(false);
     }
@@ -111,9 +111,9 @@ export default function LoginPage() {
           <img src="/logo.svg" alt="AgentScope" width={40} height={40} />
         </div>
         <div style={s.title}>AgentScope Service</div>
-        <div style={s.sub}>Sign in to continue</div>
+        <div style={s.sub}>请登录以继续</div>
         <div>
-          <label style={s.label}>Username</label>
+          <label style={s.label}>用户名</label>
           <input
             style={s.input}
             type="text"
@@ -124,7 +124,7 @@ export default function LoginPage() {
           />
         </div>
         <div>
-          <label style={s.label}>Password</label>
+          <label style={s.label}>密码</label>
           <input
             style={s.input}
             type="password"
@@ -135,7 +135,7 @@ export default function LoginPage() {
         </div>
         {error && <div style={s.error}>{error}</div>}
         <button style={s.button} type="submit" disabled={loading}>
-          {loading ? 'Signing in…' : 'Sign in'}
+          {loading ? '登录中…' : '登录'}
         </button>
       </form>
     </div>

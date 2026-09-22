@@ -17,7 +17,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Archive, ArchiveRestore, ExternalLink, MessageSquare, MoreHorizontal, Pin, PinOff, Plus, Trash2 } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   createChat,
@@ -60,12 +60,12 @@ function ChatListItem({ chat, selected, disabled, onSelect, onDelete, onRestore 
         <div className="flex items-center gap-2"><span className="min-w-0 flex-1 truncate font-medium">{chat.title}</span>{chat.pinned && <Pin className="h-3.5 w-3.5" />}</div>
         <div className="mt-1 flex items-center justify-between gap-2 text-xs text-muted-foreground"><span className="truncate">{chat.agentName}</span><span className="shrink-0">{formatRelative(chat.updatedAt)}</span></div>
       </button>
-      <DropdownMenu.Trigger asChild><button type="button" className="mr-1 rounded p-2 hover:bg-white" aria-label={`More actions for ${chat.title}`}><MoreHorizontal className="h-4 w-4" /></button></DropdownMenu.Trigger>
+      <DropdownMenu.Trigger asChild><button type="button" className="mr-1 rounded p-2 hover:bg-white" aria-label={`${chat.title} 的更多操作`}><MoreHorizontal className="h-4 w-4" /></button></DropdownMenu.Trigger>
     </div>
     <DropdownMenu.Portal><DropdownMenu.Content sideOffset={4} align="end" className="z-[100] min-w-44 rounded-lg border bg-popover p-1 text-popover-foreground shadow-lg">
       {chat.status === 'deleted'
-        ? <DropdownMenu.Item disabled={disabled} onSelect={onRestore} className="flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none focus:bg-accent"><ArchiveRestore className="h-4 w-4" />Restore chat</DropdownMenu.Item>
-        : <DropdownMenu.Item disabled={disabled} onSelect={onDelete} className="flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm text-red-700 outline-none focus:bg-red-50"><Trash2 className="h-4 w-4" />Delete chat</DropdownMenu.Item>}
+        ? <DropdownMenu.Item disabled={disabled} onSelect={onRestore} className="flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none focus:bg-accent"><ArchiveRestore className="h-4 w-4" />恢复对话</DropdownMenu.Item>
+        : <DropdownMenu.Item disabled={disabled} onSelect={onDelete} className="flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm text-red-700 outline-none focus:bg-red-50"><Trash2 className="h-4 w-4" />删除对话</DropdownMenu.Item>}
     </DropdownMenu.Content></DropdownMenu.Portal>
   </DropdownMenu.Root>;
 }
@@ -150,17 +150,17 @@ function ChatWorkspace({ chat, onChanged, initialDraft = '' }: { chat: Chat; onC
         <h2 className="text-xl font-semibold">{chat.title}</h2>
         <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
           <span>{chat.agentName}</span><Badge>{chat.status}</Badge>
-          <span>Updated {formatRelative(chat.updatedAt)}</span>
+          <span>更新于 {formatRelative(chat.updatedAt)}</span>
         </div>
       </div>
       <div className="flex gap-2">
-        {canInspectSession && <Button asChild size="sm" variant="outline"><Link to={scope.scopedPath(`/work/sessions/${encodeURIComponent(chat.sessionId)}`)}>Session diagnostics<ExternalLink className="h-3.5 w-3.5" /></Link></Button>}
-        <Button asChild size="sm" variant="outline"><Link to={scope.scopedPath(`/work/issues?new=1&fromChat=${encodeURIComponent(chat.id)}&title=${encodeURIComponent(chat.title)}&description=${encodeURIComponent(`Created from Chat with ${chat.agentName}.`)}`)}>Create issue</Link></Button>
+        {canInspectSession && <Button asChild size="sm" variant="outline"><Link to={scope.scopedPath(`/work/sessions/${encodeURIComponent(chat.sessionId)}`)}>Session 诊断<ExternalLink className="h-3.5 w-3.5" /></Link></Button>}
+        <Button asChild size="sm" variant="outline"><Link to={scope.scopedPath(`/work/issues?new=1&fromChat=${encodeURIComponent(chat.id)}&title=${encodeURIComponent(chat.title)}&description=${encodeURIComponent(`通过与 ${chat.agentName} 的对话创建。`)}`)}>创建 Issue</Link></Button>
         <Button size="sm" variant="outline" disabled={change.isPending} onClick={() => change.mutate({ pinned: !chat.pinned })}>
-          {chat.pinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}{chat.pinned ? 'Unpin' : 'Pin'}
+          {chat.pinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}{chat.pinned ? '取消固定' : '固定'}
         </Button>
         <Button size="sm" variant="outline" disabled={change.isPending} onClick={() => change.mutate({ status: chat.status !== 'active' ? 'active' : 'archived' })}>
-          {chat.status !== 'active' ? <ArchiveRestore className="h-4 w-4" /> : <Archive className="h-4 w-4" />}{chat.status !== 'active' ? 'Restore' : 'Archive'}
+          {chat.status !== 'active' ? <ArchiveRestore className="h-4 w-4" /> : <Archive className="h-4 w-4" />}{chat.status !== 'active' ? '恢复' : '归档'}
         </Button>
       </div>
     </div>
@@ -168,17 +168,17 @@ function ChatWorkspace({ chat, onChanged, initialDraft = '' }: { chat: Chat; onC
       className="min-h-[42rem] max-h-[calc(100vh-15rem)]"
       messages={[...messages, ...optimistic]}
       events={events}
-      source="personal chat"
+      source="个人对话"
       loading={timeline.loading}
       error={error || timeline.error}
-      emptyMessage={`Start a personal conversation with ${chat.agentName}. This Chat is separate from Issues.`}
+      emptyMessage={`与 ${chat.agentName} 开始个人对话。此对话与 Issue 相互独立。`}
       composer={chat.status === 'active' ? {
         value: message,
         onChange: setMessage,
         onSubmit: submit,
         busy: pending || runtimeBusy,
         disabled: pending || runtimeBusy,
-        placeholder: pending || runtimeBusy ? `${chat.agentName} is working…` : `Message ${chat.agentName}…`,
+        placeholder: pending || runtimeBusy ? `${chat.agentName} 正在处理…` : `给 ${chat.agentName} 发消息…`,
       } : undefined}
       hasEarlierMessages={timeline.hasEarlier}
       loadingEarlierMessages={timeline.loadingEarlier}
@@ -200,6 +200,12 @@ export default function ChatPage() {
   const [retryDraft, setRetryDraft] = useState<{ chatId: string; text: string }>();
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
+  const agentPickerRef = useRef<HTMLSelectElement>(null);
+  // 每次点击「新建对话」自增，用于在面板已展开时把焦点移到 Agent 选择器，给出可见反馈
+  const [focusPickerTick, setFocusPickerTick] = useState(0);
+  useEffect(() => {
+    if (focusPickerTick > 0) agentPickerRef.current?.focus();
+  }, [focusPickerTick]);
   const chats = useQuery({
     queryKey: ['chats', scope.tenant, scope.namespace, view],
     queryFn: () => listChats(scope.tenant, scope.namespace, view),
@@ -233,7 +239,8 @@ export default function ChatPage() {
       if (startNew) next.set('new', '1');
       else next.delete('new');
     }
-    setParams(next);
+    // 目标状态与当前完全一致时用 replace，否则重复点击「新建对话」会往浏览器后退栈里压重复条目
+    setParams(next, { replace: next.toString() === params.toString() });
   }
 
   const remove = useMutation({
@@ -275,7 +282,7 @@ export default function ChatPage() {
         setRetryDraft({ chatId: created.id, text: value });
         setDraft('');
       }
-      setError(cause instanceof Error ? cause.message : 'Failed to start Chat');
+      setError(cause instanceof Error ? cause.message : '无法开始对话');
     } finally {
       setCreating(false);
     }
@@ -283,28 +290,33 @@ export default function ChatPage() {
 
   const availableAgents = agents.data?.items ?? [];
   const chosenAgent = availableAgents.find(agent => agent.id === agentId);
+  const viewLabel = { active: '活跃', archived: '已归档', deleted: '已删除' } as const;
+  function startNewChat() {
+    select(undefined, true);
+    setFocusPickerTick(tick => tick + 1);
+  }
   return <Page>
-    <PageHeader title="Chat" description="Personal, multi-turn conversations with an Agent. Create an Issue when work needs shared ownership and tracking." actions={
-      <Button onClick={() => select(undefined, true)}><Plus className="mr-2 h-4 w-4" />New chat</Button>
+    <PageHeader title="对话" description="与 Agent 进行个人的多轮对话。需要共享协作和跟踪时，请创建 Issue。" actions={
+      <Button onClick={startNewChat}><Plus className="mr-2 h-4 w-4" />新建对话</Button>
     } />
     {error && <p role="alert" className="mb-4 text-sm text-red-600">{error}</p>}
     <div className="grid gap-5 lg:grid-cols-[19rem_minmax(0,1fr)]">
       <aside className="rounded-2xl border bg-white p-3">
         <div className="mb-3 flex rounded-lg bg-muted p-1">
-          {(['active', 'archived', 'deleted'] as const).map(status => <button key={status} type="button" className={`flex-1 rounded-md px-2 py-1.5 text-sm capitalize ${view === status ? 'bg-white shadow-sm' : 'text-muted-foreground'}`} onClick={() => { setView(status); select(); }}>{status}</button>)}
+          {(['active', 'archived', 'deleted'] as const).map(status => <button key={status} type="button" className={`flex-1 rounded-md px-2 py-1.5 text-sm ${view === status ? 'bg-white shadow-sm' : 'text-muted-foreground'}`} onClick={() => { setView(status); select(); }}>{viewLabel[status]}</button>)}
         </div>
-        {view === 'deleted' && <p className="px-3 py-2 text-xs text-muted-foreground">Deleted chats can be restored; execution diagnostics are retained.</p>}
+        {view === 'deleted' && <p className="px-3 py-2 text-xs text-muted-foreground">已删除的对话可以恢复，执行诊断信息会保留。</p>}
         <div className="space-y-1">
           {(chats.data?.items ?? []).map(chat => <ChatListItem key={chat.id} chat={chat} selected={chat.id === chatId}
             disabled={remove.isPending || restore.isPending} onSelect={() => select(chat)}
             onDelete={() => remove.mutate(chat)} onRestore={() => restore.mutate(chat)} />)}
-          {!chats.isLoading && !(chats.data?.items ?? []).length && <p className="px-3 py-8 text-center text-sm text-muted-foreground">No {view} chats.</p>}
+          {!chats.isLoading && !(chats.data?.items ?? []).length && <p className="px-3 py-8 text-center text-sm text-muted-foreground">暂无{viewLabel[view]}对话。</p>}
         </div>
       </aside>
       {selected ? <ChatWorkspace key={selected.id} chat={selected} onChanged={select} initialDraft={retryDraft?.chatId === selected.id ? retryDraft.text : ''} /> : <div className="space-y-4 rounded-2xl border bg-white p-6">
-        <div><h2 className="text-xl font-semibold">Start a new chat</h2><p className="mt-1 text-sm text-muted-foreground">Choose one conversation-capable Agent. Team and Workflow work should start from an Issue.</p></div>
-        <label className="grid max-w-xl gap-1.5 text-sm">Agent<select className="h-11 rounded-lg border bg-background px-3" value={agentId} onChange={event => setAgentId(event.target.value)}>
-          <option value="">Choose an Agent…</option>
+        <div><h2 className="text-xl font-semibold">开始新对话</h2><p className="mt-1 text-sm text-muted-foreground">选择一个支持对话的 Agent。Team 和 Workflow 的工作请从 Issue 开始。</p></div>
+        <label className="grid max-w-xl gap-1.5 text-sm">Agent<select ref={agentPickerRef} className="h-11 rounded-lg border bg-background px-3" value={agentId} onChange={event => setAgentId(event.target.value)}>
+          <option value="">选择 Agent…</option>
           {availableAgents.map(agent => <option key={agent.id} value={agent.id} disabled={agent.capability.state !== 'available'}>{agent.name}{agent.capability.state === 'available' ? '' : ` — ${agent.capability.state}`}</option>)}
         </select></label>
         {chosenAgent && <div className="max-w-xl rounded-xl border p-4 text-sm"><div className="flex items-center gap-2"><MessageSquare className="h-4 w-4" /><strong>{chosenAgent.name}</strong><Badge tone={chosenAgent.capability.state === 'available' ? 'success' : 'warning'}>{chosenAgent.capability.state}</Badge></div><p className="mt-2 text-muted-foreground">{chosenAgent.description || chosenAgent.capability.reason}</p></div>}
@@ -312,10 +324,10 @@ export default function ChatPage() {
           className="min-h-[28rem]"
           messages={[]}
           events={[]}
-          source="new personal chat"
-          emptyMessage={agentId ? 'Send the first message to create this Chat.' : 'Choose an Agent to begin.'}
-          composer={{ value: draft, onChange: setDraft, onSubmit: start, busy: creating, disabled: creating || !agentId || chosenAgent?.capability.state !== 'available', placeholder: 'What would you like to work through?' }}
-        /> : !agents.isLoading && <EmptyState title="No conversation-capable Agents" description="Connect a runtime and configure an Agent with conversation support first." />}
+          source="新个人对话"
+          emptyMessage={agentId ? '发送第一条消息即可创建这个对话。' : '请先选择一个 Agent。'}
+          composer={{ value: draft, onChange: setDraft, onSubmit: start, busy: creating, disabled: creating || !agentId || chosenAgent?.capability.state !== 'available', placeholder: '你想处理什么事情？' }}
+        /> : !agents.isLoading && <EmptyState title="没有可用于对话的 Agent" description="请先接入运行时，并配置一个支持对话的 Agent。" />}
       </div>}
     </div>
   </Page>;

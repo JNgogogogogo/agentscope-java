@@ -30,7 +30,7 @@ interface Props {
 const field: React.CSSProperties = { width: '100%', padding: 8, border: '1px solid #cbd5e1', borderRadius: 6 };
 const button: React.CSSProperties = { padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: 6, background: '#fff' };
 const emptySettings = (): McpOAuthSettings => ({ authorizationEndpoint: '', tokenEndpoint: '', clientId: '', authMethod: 'client_secret_basic', scope: '' });
-const errorText = (e: unknown) => e instanceof Error ? e.message : 'OAuth request failed';
+const errorText = (e: unknown) => e instanceof Error ? e.message : 'OAuth 请求失败';
 
 export default function McpOAuthConnect({ server, onClose, onConnected }: Props) {
   const [vaults, setVaults] = useState<Vault[]>([]);
@@ -90,10 +90,10 @@ export default function McpOAuthConnect({ server, onClose, onConnected }: Props)
     e.preventDefault(); setBusy(true); setError(''); setNotice('');
     try {
       const parsed: unknown = JSON.parse(params);
-      if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object' || Object.values(parsed).some(v => typeof v !== 'string')) throw new Error('Authorization parameters must be a JSON object with string values.');
+      if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object' || Object.values(parsed).some(v => typeof v !== 'string')) throw new Error('授权参数必须是值为字符串的 JSON 对象。');
       const saved = await saveMcpOAuth(vaultId, { ...settings, authorizationParams: parsed as Record<string, string>, serverName: connection?.serverName ?? server.name, endpoint: server.url! }, connection?.id);
       setConnection(saved); setSettings({ ...saved.settings, clientSecret: '' }); setDirty(false);
-      setNotice('Application saved. Register the callback URL below with your provider, then connect your account.');
+      setNotice('应用已保存。请把下面的回调地址注册到你的服务商，然后连接账号。');
     } catch (e) { setError(errorText(e)); } finally { setBusy(false); }
   }
   async function attach(id: string) {
@@ -113,13 +113,13 @@ export default function McpOAuthConnect({ server, onClose, onConnected }: Props)
     const flow = active.current;
     if (!flow) return;
     setBusy(true);
-    try { await cancelMcpOAuth(flow.connection, flow.flowId); finishWaiting(); setNotice('Authorization cancelled.'); }
+    try { await cancelMcpOAuth(flow.connection, flow.flowId); finishWaiting(); setNotice('授权已取消。'); }
     catch (e) { setError(errorText(e)); setBusy(false); }
   }
   async function connect() {
     if (!connection && (!managedGitHub || !vaultId || !provider?.configured)) return;
     const popup = window.open('about:blank', '_blank', 'popup,width=620,height=760');
-    if (!popup) { setError('Allow pop-ups for this console, then try again.'); return; }
+    if (!popup) { setError('请允许此控制台弹出窗口，然后重试。'); return; }
     popup.opener = null;
     popupRef.current = popup;
     setBusy(true); setError(''); setNotice('');
@@ -143,10 +143,10 @@ export default function McpOAuthConnect({ server, onClose, onConnected }: Props)
             const result = await completeMcpOAuth(selected, flow.flowId);
             if (active.current !== current) return;
             finishWaiting(); setBusy(true); setConnection({ ...selected, connected: true, account: undefined });
-            setNotice(onConnected ? 'Account connected. Adding the Vault to this agent…' : 'Account connected. Select this Vault in the agent runtime configuration or when starting a session.');
+            setNotice(onConnected ? '账号已连接。正在把 Vault 添加到此 Agent…' : '账号已连接。请在 Agent 运行时配置中或启动 Session 时选择该 Vault。');
             try {
               await attach(result.vaultId);
-              if (onConnected && mounted.current) setNotice('Account connected and Vault added to this agent. Start a new session to use it.');
+              if (onConnected && mounted.current) setNotice('账号已连接，Vault 已添加到此 Agent。启动新 Session 即可使用。');
             }
             catch (e) { if (mounted.current) setError(`Account connected, but the agent could not be updated: ${errorText(e)}. Retry below.`); }
             if (selected.provider === 'github' && mounted.current) {
@@ -159,7 +159,7 @@ export default function McpOAuthConnect({ server, onClose, onConnected }: Props)
             return;
           }
           if (['failed', 'cancelled', 'expired'].includes(state.status)) throw new Error(`Authorization ${state.status}${state.errorCode ? ` (${state.errorCode})` : ''}. Try connecting again.`);
-          if (Date.now() >= flow.expiresAt) throw new Error('Authorization expired. Try connecting again.');
+          if (Date.now() >= flow.expiresAt) throw new Error('授权已过期，请重新连接。');
           // A provider can close or sever the popup reference. Keep polling until completion,
           // cancellation or expiry; popup.closed alone is not a reliable OAuth result.
           current.timer = setTimeout(() => void poll(), 1500);
@@ -187,61 +187,61 @@ export default function McpOAuthConnect({ server, onClose, onConnected }: Props)
   const disabled = busy || waiting || loading;
   return <Dialog open onOpenChange={open => { if (!open && !busy) onClose(); }}>
     <DialogContent size="lg" onPointerDownOutside={e => e.preventDefault()}>
-      <DialogHeader><DialogTitle>{github ? 'Connect GitHub' : 'Connect account'} · {server.name}</DialogTitle><DialogDescription>Sign in with the MCP provider. Tokens are encrypted in the selected Vault and used for this exact endpoint.</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>{github ? '连接 GitHub' : '连接账号'} · {server.name}</DialogTitle><DialogDescription>使用 MCP 服务商登录。Token 会加密存放在所选 Vault 中，仅用于该端点。</DialogDescription></DialogHeader>
       <DialogBody>
         <p className="mb-4 break-all text-sm text-slate-500">{server.url}</p>
-        <div className="flex items-end gap-3"><label className="flex-1">Vault<select style={field} value={vaultId} disabled={disabled} onChange={e => setVaultId(e.target.value)}><option value="">Select a Vault</option>{vaults.map(v => <option key={v.id} value={v.id}>{v.displayName}</option>)}</select></label><button style={button} disabled={disabled} onClick={() => void create()}>Create Vault</button></div>
-        <p className="my-3 text-sm text-slate-500">Choose who can use this account by choosing its Vault. Agents and sessions using this Vault can access the authorized MCP endpoint.</p>
+        <div className="flex items-end gap-3"><label className="flex-1">Vault<select style={field} value={vaultId} disabled={disabled} onChange={e => setVaultId(e.target.value)}><option value="">选择 Vault</option>{vaults.map(v => <option key={v.id} value={v.id}>{v.displayName}</option>)}</select></label><button style={button} disabled={disabled} onClick={() => void create()}>创建 Vault</button></div>
+        <p className="my-3 text-sm text-slate-500">通过选择 Vault 来决定谁可以使用该账号。使用该 Vault 的 Agent 和 Session 可以访问已授权的 MCP 端点。</p>
         {error && <p role="alert" className="my-3 text-red-700">{error}</p>}
         {notice && <p role="status" className="my-3 text-emerald-800">{notice}</p>}
-        {loading && <p>Loading…</p>}
+        {loading && <p>加载中…</p>}
         {managedGitHub && <div className="my-4 rounded-md bg-slate-50 p-3 text-sm">
-          {!provider ? <p>Checking GitHub integration…</p> : provider.configured ? <><p>GitHub is configured by your platform administrator. Select or create a Vault, then sign in to authorize your account.</p><p className="mt-2">{provider.scope ? `Requested OAuth scopes: ${provider.scope}` : 'Access follows the GitHub application’s configured permissions.'} Organization approval may be required.</p></> : <p>A platform administrator must configure the GitHub application before accounts can connect. {isAdmin() && <a className="text-indigo-600 underline" href="/settings/integrations" target="_blank" rel="noreferrer">Open integration settings</a>}</p>}
+          {!provider ? <p>正在检查 GitHub 集成…</p> : provider.configured ? <><p>GitHub 由平台管理员配置。请选择或创建一个 Vault，然后登录以授权你的账号。</p><p className="mt-2">{provider.scope ? `Requested OAuth scopes: ${provider.scope}` : '访问权限遵循 GitHub 应用已配置的权限。'} Organization approval may be required.</p></> : <p>A platform administrator must configure the GitHub application before accounts can connect. {isAdmin() && <a className="text-indigo-600 underline" href="/settings/integrations" target="_blank" rel="noreferrer">打开集成设置</a>}</p>}
         </div>}
         {vaultId && !loading && <>
           {!managedGitHub && <form onSubmit={save}>
             <fieldset disabled={disabled} className="grid gap-3">
               <details open={!connection || dirty}>
-                <summary className="mb-3 cursor-pointer font-medium">OAuth application settings</summary>
+                <summary className="mb-3 cursor-pointer font-medium">OAuth 应用设置</summary>
                 <div className="grid gap-3">
-                  <p className="text-sm text-slate-500">Register an OAuth application with your provider and enter its settings. All connections use Authorization Code with PKCE (S256).</p>
-                  <label>Authorization endpoint<input style={field} type="url" required placeholder="https://auth.example.com/oauth/authorize" value={settings.authorizationEndpoint} onChange={e => change('authorizationEndpoint', e.target.value)} /></label>
-                  <label>Token endpoint<input style={field} type="url" required placeholder="https://auth.example.com/oauth/token" value={settings.tokenEndpoint} onChange={e => change('tokenEndpoint', e.target.value)} /></label>
-                  <label>Client ID<input style={field} required value={settings.clientId} onChange={e => change('clientId', e.target.value)} /></label>
-                  <label>Client authentication<select style={field} value={settings.authMethod} onChange={e => change('authMethod', e.target.value)}><option value="client_secret_basic">Client secret — Basic</option><option value="client_secret_post">Client secret — POST</option><option value="none">Public client — no secret</option></select></label>
-                  {settings.authMethod !== 'none' && <label>Client secret<input style={field} type="password" autoComplete="new-password" required={!connection?.hasClientSecret} placeholder={connection?.hasClientSecret ? 'Saved securely; leave blank to keep' : 'Provided by your OAuth application'} value={settings.clientSecret ?? ''} onChange={e => change('clientSecret', e.target.value)} /></label>}
-                  <label>Scopes<input style={field} placeholder="crm.read offline_access" value={settings.scope} onChange={e => change('scope', e.target.value)} /></label>
-                  <label>Resource (optional)<input style={field} type="url" placeholder={server.url} value={settings.resource ?? ''} onChange={e => change('resource', e.target.value)} /></label>
+                  <p className="text-sm text-slate-500">在服务商处注册 OAuth 应用并填写其设置。所有连接都使用 Authorization Code + PKCE（S256）。</p>
+                  <label>授权端点<input style={field} type="url" required placeholder="https://auth.example.com/oauth/authorize" value={settings.authorizationEndpoint} onChange={e => change('authorizationEndpoint', e.target.value)} /></label>
+                  <label>Token 端点<input style={field} type="url" required placeholder="https://auth.example.com/oauth/token" value={settings.tokenEndpoint} onChange={e => change('tokenEndpoint', e.target.value)} /></label>
+                  <label>客户端 ID<input style={field} required value={settings.clientId} onChange={e => change('clientId', e.target.value)} /></label>
+                  <label>客户端鉴权<select style={field} value={settings.authMethod} onChange={e => change('authMethod', e.target.value)}><option value="client_secret_basic">客户端密钥 — Basic</option><option value="client_secret_post">客户端密钥 — POST</option><option value="none">公共客户端 — 无密钥</option></select></label>
+                  {settings.authMethod !== 'none' && <label>客户端密钥<input style={field} type="password" autoComplete="new-password" required={!connection?.hasClientSecret} placeholder={connection?.hasClientSecret ? '已安全保存；留空表示保持不变' : '由你的 OAuth 应用提供'} value={settings.clientSecret ?? ''} onChange={e => change('clientSecret', e.target.value)} /></label>}
+                  <label>授权范围<input style={field} placeholder="crm.read offline_access" value={settings.scope} onChange={e => change('scope', e.target.value)} /></label>
+                  <label>资源（可选）<input style={field} type="url" placeholder={server.url} value={settings.resource ?? ''} onChange={e => change('resource', e.target.value)} /></label>
                   <p className="text-sm text-slate-500">For MCP authorization servers, set Resource to the protected MCP resource URI (often the endpoint above). Use the provider’s documented scopes.</p>
-                  <label>Expected issuer (optional)<input style={field} type="url" placeholder="https://auth.example.com" value={settings.issuer ?? ''} onChange={e => change('issuer', e.target.value)} /></label>
-                  <p className="text-sm text-slate-500">Set issuer only if the provider returns the OAuth authorization response “iss” parameter.</p>
-                  <label>Additional authorization parameters<textarea style={field} rows={3} value={params} placeholder={'{"access_type":"offline","prompt":"consent"}'} onChange={e => { setParams(e.target.value); setDirty(true); }} /></label>
-                  <p className="text-sm text-slate-500">Optional JSON: access_type, prompt, audience, login_hint, include_granted_scopes.</p>
-                  <button style={button} type="submit">Save application</button>
+                  <label>预期签发者（可选）<input style={field} type="url" placeholder="https://auth.example.com" value={settings.issuer ?? ''} onChange={e => change('issuer', e.target.value)} /></label>
+                  <p className="text-sm text-slate-500">仅当服务商返回 OAuth 授权响应中的 “iss” 参数时才需要设置签发者。</p>
+                  <label>附加授权参数<textarea style={field} rows={3} value={params} placeholder={'{"access_type":"offline","prompt":"consent"}'} onChange={e => { setParams(e.target.value); setDirty(true); }} /></label>
+                  <p className="text-sm text-slate-500">可选 JSON：access_type、prompt、audience、login_hint、include_granted_scopes。</p>
+                  <button style={button} type="submit">保存应用</button>
                 </div>
               </details>
             </fieldset>
           </form>}
-          {managedGitHub && !connection && <button style={button} disabled={disabled || !provider?.configured} onClick={() => void connect()}>Connect GitHub account</button>}
+          {managedGitHub && !connection && <button style={button} disabled={disabled || !provider?.configured} onClick={() => void connect()}>连接 GitHub 账号</button>}
           {connection && <div className="mt-4 grid gap-3">
-            {!managedGitHub && <><label>Callback URL<input style={field} readOnly value={connection.callbackUrl} onFocus={e => e.target.select()} /></label>
-            <p className="text-sm text-slate-500">Register this exact URL in the provider’s OAuth application before connecting.</p></>}
-            <p>Account: <strong>{connection.connected ? 'Connected' : 'Not connected'}</strong></p>
+            {!managedGitHub && <><label>回调地址<input style={field} readOnly value={connection.callbackUrl} onFocus={e => e.target.select()} /></label>
+            <p className="text-sm text-slate-500">连接前请把此 URL 原样注册到服务商的 OAuth 应用中。</p></>}
+            <p>账号：<strong>{connection.connected ? '已连接' : '未连接'}</strong></p>
             {connection.connected && managedGitHub && <div className="rounded-md border p-3 text-sm" role="status">
-              {connection.account?.login && <p>GitHub account: <strong>@{connection.account.login}</strong></p>}
-              <p>{connection.account?.errorCode?.includes('reauthorization_required') || connection.account?.status === 'reauthorization_required' ? 'GitHub authorization could not be used. Reconnect your account.' : connection.account?.status === 'ready' ? `MCP connection verified · ${connection.account.toolCount} tools discovered` : connection.account?.login ? 'Account authorized; MCP tools are not yet available.' : 'Account authorized; verification is required.'}</p>
+              {connection.account?.login && <p>GitHub 账号：<strong>@{connection.account.login}</strong></p>}
+              <p>{connection.account?.errorCode?.includes('reauthorization_required') || connection.account?.status === 'reauthorization_required' ? 'GitHub 授权无法使用，请重新连接账号。' : connection.account?.status === 'ready' ? `MCP connection verified · ${connection.account.toolCount} tools discovered` : connection.account?.login ? '账号已授权；MCP 工具尚不可用。' : '账号已授权；需要完成验证。'}</p>
               {connection.account?.scope && <p>Granted scopes: {connection.account.scope}</p>}
               {connection.account?.errorCode && <p className="mt-2 text-amber-800">{connection.account.errorCode}. Check account permissions and organization access, or reconnect your account.</p>}
               {connection.account?.checkedAt && <p>Last checked: {new Date(connection.account.checkedAt).toLocaleString()}</p>}
               <p className="mt-2 text-slate-500">This checks connectivity from the control plane. Agent tool permissions and runtime connectivity still apply. Start a new session after adding this Vault.</p>
             </div>}
-            {waiting ? <><p role="status">Complete login and consent in the provider window, then return here. Keep this dialog open.</p><button style={button} disabled={busy} onClick={() => void cancel()}>Cancel authorization</button></> : <div className="flex flex-wrap gap-3">
-              <button style={button} disabled={disabled || dirty || (managedGitHub && !provider?.configured)} onClick={() => void connect()}>{connection.connected ? 'Reconnect account' : 'Connect account'}</button>
-              {connection.connected && managedGitHub && <button style={button} disabled={disabled} onClick={async () => { setBusy(true); setError(''); try { const account = await verifyGitHubConnection(connection); setConnection({ ...connection, account }); } catch (e) { setError(errorText(e)); } finally { setBusy(false); } }}>Verify connection</button>}
-              {connection.connected && <button style={button} disabled={disabled} onClick={() => void disconnect()}>Disconnect from Vault</button>}
+            {waiting ? <><p role="status">请在服务商窗口中完成登录与授权，然后回到这里。保持此对话框打开。</p><button style={button} disabled={busy} onClick={() => void cancel()}>取消授权</button></> : <div className="flex flex-wrap gap-3">
+              <button style={button} disabled={disabled || dirty || (managedGitHub && !provider?.configured)} onClick={() => void connect()}>{connection.connected ? '重新连接账号' : '连接账号'}</button>
+              {connection.connected && managedGitHub && <button style={button} disabled={disabled} onClick={async () => { setBusy(true); setError(''); try { const account = await verifyGitHubConnection(connection); setConnection({ ...connection, account }); } catch (e) { setError(errorText(e)); } finally { setBusy(false); } }}>验证连接</button>}
+              {connection.connected && <button style={button} disabled={disabled} onClick={() => void disconnect()}>与 Vault 断开连接</button>}
               {connection.connected && onConnected && <button style={button} disabled={disabled} onClick={async () => { setBusy(true); setError(''); try { await attach(vaultId); setNotice('Vault added to this agent. Start a new session to use it.'); } catch (e) { setError(errorText(e)); } finally { setBusy(false); } }}>{needsAttach ? 'Retry adding Vault to agent' : 'Use for this agent'}</button>}
             </div>}
-            {dirty && <p className="text-sm">Save application changes before connecting.</p>}
+            {dirty && <p className="text-sm">请先保存应用变更再连接。</p>}
           </div>}
         </>}
       </DialogBody>

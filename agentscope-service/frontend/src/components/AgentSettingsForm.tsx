@@ -168,7 +168,7 @@ export default function AgentSettingsForm({
     let cancelled = false;
     listVersions(agent.id)
       .then(v => { if (!cancelled) { setVersions(v); setVersionsErr(null); } })
-      .catch(e => { if (!cancelled) setVersionsErr(e instanceof Error ? e.message : 'Failed to load versions'); });
+      .catch(e => { if (!cancelled) setVersionsErr(e instanceof Error ? e.message : '加载版本失败'); });
     return () => { cancelled = true; };
   }, [agent.id, agent.scope, agent.ownerId, agent.version, section]);
 
@@ -189,7 +189,7 @@ export default function AgentSettingsForm({
       setOk(true);
       await onSaved?.();
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Save failed');
+      setErr(e instanceof Error ? e.message : '保存失败');
     } finally {
       setSaving(false);
     }
@@ -201,7 +201,7 @@ export default function AgentSettingsForm({
       await deleteAgent(agent.id);
       navigate(scope.scopedPath('/agent-center/agents'), { replace: true });
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Delete failed');
+      setErr(e instanceof Error ? e.message : '删除失败');
     }
   }
 
@@ -215,7 +215,7 @@ export default function AgentSettingsForm({
       await onSaved?.();
       setOk(true);
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Archive failed');
+      setErr(e instanceof Error ? e.message : '归档失败');
     } finally {
       setArchiving(false);
     }
@@ -235,7 +235,7 @@ export default function AgentSettingsForm({
       )}
 
       {show('settings') && <div style={S.card}>
-        <span style={S.cardLabel}>Identity</span>
+        <span style={S.cardLabel}>身份</span>
 
         <div style={S.row}>
           <label style={S.fieldLabel}>Agent ID</label>
@@ -244,7 +244,7 @@ export default function AgentSettingsForm({
 
         {agent.version != null && (
           <div style={S.row}>
-            <label style={S.fieldLabel}>Current version</label>
+            <label style={S.fieldLabel}>当前版本</label>
             <div style={S.meta}>v{version ?? agent.version}</div>
           </div>
         )}
@@ -259,7 +259,7 @@ export default function AgentSettingsForm({
         )}
 
         <div style={S.row}>
-          <label style={S.fieldLabel}>Name</label>
+          <label style={S.fieldLabel}>名称</label>
           <input
             style={S.input}
             value={name}
@@ -269,22 +269,22 @@ export default function AgentSettingsForm({
         </div>
 
         <div style={S.row}>
-          <label style={S.fieldLabel}>Description</label>
+          <label style={S.fieldLabel}>描述</label>
           <input
             style={S.input}
             value={description}
             onChange={e => setDescription(e.target.value)}
             disabled={readOnly}
-            placeholder="Short summary shown on cards and tabs"
+            placeholder="显示在卡片和标签页上的简短摘要"
           />
         </div>
 
       </div>}
 
       {show('behavior') && <div style={S.card}>
-        <span style={S.cardLabel}>Model</span>
+        <span style={S.cardLabel}>模型</span>
         <div style={S.row}>
-          <label style={S.fieldLabel}>Model</label>
+          <label style={S.fieldLabel}>模型</label>
           <input
             style={S.input}
             value={model}
@@ -301,14 +301,14 @@ export default function AgentSettingsForm({
       {show('workspace') && <div style={S.card}>
         <span style={S.cardLabel}>Workspace</span>
         <div style={S.row}>
-          <label style={S.fieldLabel}>Linked workspace</label>
+          <label style={S.fieldLabel}>关联的 Workspace</label>
           <select
             style={S.input}
             value={workspaceId}
             onChange={e => setWorkspaceId(e.target.value)}
             disabled={readOnly}
           >
-            <option value="">None (agent-private skills/tools/files)</option>
+            <option value="">无（技能/工具/文件仅该 Agent 私有）</option>
             {workspaces.map(w => (
               <option key={w.id} value={w.id}>{w.name}</option>
             ))}
@@ -342,12 +342,12 @@ export default function AgentSettingsForm({
       </div>}
 
       {show('runtime') && <div style={S.card}>
-        <span style={S.cardLabel}>Session defaults</span>
+        <span style={S.cardLabel}>Session 默认值</span>
         <div style={{ fontSize: '0.8rem', color: '#94a3b8', marginBottom: 14, lineHeight: 1.5 }}>
           These resources are selected by default for new Managed sessions. A session can keep its own explicit bindings.
         </div>
         <div style={S.row}>
-          <label style={S.fieldLabel} htmlFor="agent-default-environment">Default environment</label>
+          <label style={S.fieldLabel} htmlFor="agent-default-environment">默认环境</label>
           <select
             style={S.input}
             id="agent-default-environment"
@@ -355,17 +355,17 @@ export default function AgentSettingsForm({
             onChange={e => setDefaultEnvironmentId(e.target.value)}
             disabled={readOnly}
           >
-            <option value="">Automatic default</option>
+            <option value="">自动选择默认</option>
             {environments.map(env => (
               <option key={env.id} value={env.id}>{env.name} ({env.type})</option>
             ))}
           </select>
           <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: 6 }}>
-            <Link to={scope.scopedPath('/agent-center/environments')} className="text-primary underline">Manage environments</Link> to configure local, remote, sandbox or self_hosted execution.
+            <Link to={scope.scopedPath('/agent-center/environments')} className="text-primary underline">管理环境</Link> to configure local, remote, sandbox or self_hosted execution.
           </div>
         </div>
         <div style={S.row}>
-          <label style={S.fieldLabel}>Default vaults</label>
+          <label style={S.fieldLabel}>默认 Vault</label>
           {vaults.length === 0 ? (
             <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
               No vaults yet. Create one under Resources → Vault.
@@ -393,7 +393,7 @@ export default function AgentSettingsForm({
           )}
         </div>
         <div style={S.row}>
-          <label style={S.fieldLabel}>Default memory stores</label>
+          <label style={S.fieldLabel}>默认记忆库</label>
           {memoryStores.length === 0 ? (
             <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
               No memory stores yet. Create one under Resources → Memory.
@@ -423,22 +423,22 @@ export default function AgentSettingsForm({
       </div>}
 
       {show('behavior') && <div style={S.card}>
-        <span style={S.cardLabel}>Behavior</span>
-        <p className="mb-5 text-sm text-muted-foreground">Saved definitions are used for new sessions. Existing sessions keep their own configuration.</p>
+        <span style={S.cardLabel}>行为</span>
+        <p className="mb-5 text-sm text-muted-foreground">保存的定义用于新 Session；已有 Session 保留各自的配置。</p>
 
         <div style={S.row}>
-          <label style={S.fieldLabel}>System prompt</label>
+          <label style={S.fieldLabel}>系统提示词</label>
           <textarea
             style={S.textarea}
             value={system}
             onChange={e => setSystem(e.target.value)}
             disabled={readOnly}
-            placeholder="Optional override. When linked and empty, Workspace AGENTS.md is used on rematerialize."
+            placeholder="可选覆盖项。已关联且留空时，重新生成将使用 Workspace 的 AGENTS.md。"
           />
         </div>
 
         <div style={S.row}>
-          <label style={S.fieldLabel}>Max iterations</label>
+          <label style={S.fieldLabel}>最大迭代次数</label>
           <input
             style={{ ...S.input, width: 140 }}
             type="number"
@@ -454,20 +454,20 @@ export default function AgentSettingsForm({
       {canEdit && section !== 'versions' && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
           <button style={S.saveBtn} onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving…' : 'Save changes'}
+            {saving ? '保存中…' : '保存变更'}
           </button>
           {show('settings') && canShare && (
             <button style={S.shareBtn} onClick={() => setShareOpen(true)}>↗ Share</button>
           )}
           {show('settings') && !agent.archivedAt && agent.status !== 'archived' && (
             <button style={S.dangerBtn} onClick={handleArchive} disabled={archiving}>
-              {archiving ? 'Archiving…' : 'Archive agent'}
+              {archiving ? '归档中…' : '归档 Agent'}
             </button>
           )}
-          {section === 'all' && <button style={S.dangerBtn} onClick={handleDelete}>Delete agent</button>}
+          {section === 'all' && <button style={S.dangerBtn} onClick={handleDelete}>删除 Agent</button>}
         </div>
       )}
-      {ok && <p style={S.success}>Saved.</p>}
+      {ok && <p style={S.success}>已保存。</p>}
       {err && <p style={S.error}>{err}</p>}
 
       {shareOpen && (
@@ -475,10 +475,10 @@ export default function AgentSettingsForm({
       )}
 
       {show('versions') && <div style={{ ...S.card, marginTop: 24 }}>
-        <span style={S.cardLabel}>Version history</span>
+        <span style={S.cardLabel}>版本历史</span>
         {versionsErr && <p style={S.error}>{versionsErr}</p>}
         {!versionsErr && versions.length === 0 && (
-          <p style={{ color: '#94a3b8', fontSize: '0.88rem', margin: 0 }}>No version snapshots yet.</p>
+          <p style={{ color: '#94a3b8', fontSize: '0.88rem', margin: 0 }}>暂无版本快照。</p>
         )}
         {versions.map(v => (
           <div key={v.version} style={{
@@ -510,17 +510,17 @@ export default function AgentSettingsForm({
       </div>}
 
       {show('settings') && <div style={{ ...S.card, marginTop: 24 }}>
-        <span style={S.cardLabel}>Metadata</span>
+        <span style={S.cardLabel}>元数据</span>
         <div style={S.row}>
-          <label style={S.fieldLabel}>Owner</label>
+          <label style={S.fieldLabel}>所有者</label>
           <div style={S.meta}>{agent.ownerId ?? '—'}</div>
         </div>
         <div style={S.row}>
-          <label style={S.fieldLabel}>Created</label>
+          <label style={S.fieldLabel}>创建时间</label>
           <div style={S.meta}>{new Date(agent.createdAt).toLocaleString()}</div>
         </div>
         <div style={S.row}>
-          <label style={S.fieldLabel}>Updated</label>
+          <label style={S.fieldLabel}>更新时间</label>
           <div style={S.meta}>{new Date(agent.updatedAt).toLocaleString()}</div>
         </div>
       </div>}

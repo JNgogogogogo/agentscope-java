@@ -155,7 +155,7 @@ export default function WorkspaceDetailPage() {
       await reloadMeta();
       setErr(null);
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Save failed');
+      setErr(e instanceof Error ? e.message : '保存失败');
     } finally {
       setSaving(false);
     }
@@ -235,7 +235,7 @@ export default function WorkspaceDetailPage() {
         {ws?.name || id}
       </h1>
       <p style={{ margin: '0 0 8px', color: '#64748b' }}>
-        {ws?.description || 'Share instructions, skills, tools and subagents with the Agents linked to this Workspace.'}
+        {ws?.description || '与关联到该 Workspace 的 Agent 共享指令、技能、工具和 Subagent。'}
       </p>
       <div style={{ color: '#94a3b8', fontSize: '0.82rem', marginBottom: 18 }}>
         v{ws?.version ?? '?'} · skills {ws?.skillCount ?? skills.length} · subagents{' '}
@@ -249,9 +249,9 @@ export default function WorkspaceDetailPage() {
         {(
           [
             ['agentsmd', 'AGENTS.md'],
-            ['skills', 'Skills'],
-            ['tools', 'Tools'],
-            ['subagents', 'Subagents'],
+            ['skills', '技能'],
+            ['tools', '工具'],
+            ['subagents', 'Subagent'],
           ] as const
         ).map(([k, label]) => (
           <button
@@ -310,9 +310,9 @@ export default function WorkspaceDetailPage() {
         </div>
       )}
 
-      {tab === 'skills' && <div className="mb-4 flex flex-wrap items-center gap-2" aria-label="Skills navigation">
-        {([['installed', 'Installed skills'], ['browse', 'Install from marketplace'], ['sources', 'Manage sources']] as const).map(([key, label]) => <button key={key} className={`rounded-lg border border-border px-3 py-2 text-sm ${skillView === key ? 'bg-indigo-50 border-indigo-200' : 'bg-white'}`} onClick={() => setSkillView(key)}>{label}</button>)}
-        <p className="w-full text-sm text-muted-foreground">Create or install skills in this draft, then publish a revision and update the Agent binding to use them.</p>
+      {tab === 'skills' && <div className="mb-4 flex flex-wrap items-center gap-2" aria-label="技能导航">
+        {([['installed', '已安装技能'], ['browse', '从市场安装'], ['sources', '管理来源']] as const).map(([key, label]) => <button key={key} className={`rounded-lg border border-border px-3 py-2 text-sm ${skillView === key ? 'bg-indigo-50 border-indigo-200' : 'bg-white'}`} onClick={() => setSkillView(key)}>{label}</button>)}
+        <p className="w-full text-sm text-muted-foreground">在此草稿中创建或安装技能，然后发布一个修订并更新 Agent 绑定以启用它们。</p>
       </div>}
       {tab === 'skills' && skillView === 'installed' && (
         <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]" style={{ minHeight: 420 }}>
@@ -321,14 +321,14 @@ export default function WorkspaceDetailPage() {
               <input
                 value={newSkillName}
                 onChange={e => setNewSkillName(e.target.value)}
-                placeholder="skill-name"
+                placeholder="技能名称"
                 style={{ flex: 1, padding: 8, borderRadius: 8, border: '1px solid #cbd5e1' }}
               />
               <button
                 onClick={async () => {
                   const name = newSkillName.trim();
                   if (!name) return;
-                  if (skills.some(skill => skill.dirName === name)) { setErr('A skill with this name already exists. Open it to edit, or choose another name.'); return; }
+                  if (skills.some(skill => skill.dirName === name)) { setErr('已存在同名技能。打开它进行编辑，或换一个名称。'); return; }
                   const md = `---\nname: ${name}\ndescription: \n---\n\n# ${name}\n\n`;
                   await putWorkspaceResourceSkill(id, name, md);
                   setNewSkillName('');
@@ -365,12 +365,12 @@ export default function WorkspaceDetailPage() {
                 }}
               >
                 <div style={{ fontWeight: 650 }}>{sk.name}</div>
-                <div className="mt-1 text-xs text-indigo-700">{sk.origin === 'marketplace' ? 'Marketplace' : 'Custom'}{sk.marketplace?.repoLocation ? ` · ${sk.marketplace.repoLocation}` : ''}{sk.marketplace?.version ? ` · ${sk.marketplace.version.slice(0, 12)}` : ''}{sk.modified ? ' · Locally modified' : ''}</div>
+                <div className="mt-1 text-xs text-indigo-700">{sk.origin === 'marketplace' ? '市场' : '自定义'}{sk.marketplace?.repoLocation ? ` · ${sk.marketplace.repoLocation}` : ''}{sk.marketplace?.version ? ` · ${sk.marketplace.version.slice(0, 12)}` : ''}{sk.modified ? ' · 本地已修改' : ''}</div>
                 <div style={{ color: '#94a3b8', fontSize: '0.78rem' }}>{sk.description || sk.dirName}</div>
               </button>
             ))}
             {skills.length === 0 && (
-              <div style={{ padding: 16, color: '#94a3b8', fontSize: '0.85rem' }}>No skills yet.</div>
+              <div style={{ padding: 16, color: '#94a3b8', fontSize: '0.85rem' }}>暂无技能。</div>
             )}
           </div>
           <div style={card}>
@@ -433,7 +433,7 @@ export default function WorkspaceDetailPage() {
                 />
               </>
             ) : (
-              <div style={{ color: '#94a3b8' }}>Select or create a skill.</div>
+              <div style={{ color: '#94a3b8' }}>选择或创建一个技能。</div>
             )}
           </div>
         </div>
@@ -442,7 +442,7 @@ export default function WorkspaceDetailPage() {
       {tab === 'tools' && (
         <div style={{ display: 'grid', gap: 16 }}>
           <section style={card}>
-            <h3 style={{ margin: '0 0 12px' }}>MCP catalog</h3>
+            <h3 style={{ margin: '0 0 12px' }}>MCP 目录</h3>
             <div style={{ display: 'grid', gap: 10 }}>
               {mcpCatalog.map(entry => (
                 <div key={String(entry.id)} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -469,7 +469,7 @@ export default function WorkspaceDetailPage() {
                       fontWeight: 600,
                     }}
                   >
-                    {mcpServers.some(server => server.name === String(entry.id || entry.name)) ? 'Configured' : 'Configure connection'}
+                    {mcpServers.some(server => server.name === String(entry.id || entry.name)) ? '已配置' : '配置连接'}
                   </button>
                 </div>
               ))}
@@ -485,7 +485,7 @@ export default function WorkspaceDetailPage() {
             setMcpServers(servers); setTools(nextTools); await reloadMeta();
           }} />
           <section style={card}>
-            <h3 style={{ margin: '0 0 12px' }}>Builtin toolset</h3>
+            <h3 style={{ margin: '0 0 12px' }}>内置工具集</h3>
             <div style={{ display: 'grid', gap: 8 }}>
               {catalog.map(t => {
                 const on = enabledSet().has(t.id);
@@ -508,7 +508,7 @@ export default function WorkspaceDetailPage() {
       {tab === 'subagents' && (
         <div style={{ display: 'grid', gap: 14 }}>
           <section style={card}>
-            <h3 style={{ margin: '0 0 12px' }}>Add subagent</h3>
+            <h3 style={{ margin: '0 0 12px' }}>添加 Subagent</h3>
             <div style={{ display: 'grid', gap: 8 }}>
               <input
                 placeholder="name"
@@ -517,13 +517,13 @@ export default function WorkspaceDetailPage() {
                 style={{ padding: 10, borderRadius: 8, border: '1px solid #cbd5e1' }}
               />
               <input
-                placeholder="description (required)"
+                placeholder="描述（必填）"
                 value={saDesc}
                 onChange={e => setSaDesc(e.target.value)}
                 style={{ padding: 10, borderRadius: 8, border: '1px solid #cbd5e1' }}
               />
               <textarea
-                placeholder="inline system prompt"
+                placeholder="内联 system prompt"
                 value={saBody}
                 onChange={e => setSaBody(e.target.value)}
                 style={{
@@ -536,7 +536,7 @@ export default function WorkspaceDetailPage() {
               <button
                 onClick={async () => {
                   if (!saName.trim() || !saDesc.trim()) {
-                    setErr('Subagent name and description are required');
+                    setErr('Subagent 名称和描述为必填项');
                     return;
                   }
                   await upsertWorkspaceResourceSubagent(id, saName.trim(), {
@@ -603,7 +603,7 @@ export default function WorkspaceDetailPage() {
               </div>
             ))}
             {subagents.length === 0 && (
-              <div style={{ color: '#94a3b8' }}>Create a subagent to delegate a focused part of the work. Its runtime must support the selected capabilities.</div>
+              <div style={{ color: '#94a3b8' }}>创建 Subagent 来委派工作中相对独立的部分。其运行时必须支持所选能力。</div>
             )}
           </section>
         </div>
@@ -613,17 +613,17 @@ export default function WorkspaceDetailPage() {
         <div style={{ display: 'grid', gap: 16 }}>
           {skillView === 'sources' && <>
           <section style={card}>
-            <h3 style={{ margin: '0 0 12px' }}>Register marketplace</h3>
+            <h3 style={{ margin: '0 0 12px' }}>注册市场</h3>
             <div style={{ display: 'grid', gap: 10 }}>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <input
-                  placeholder="Name"
+                  placeholder="名称"
                   value={mktName}
                   onChange={e => setMktName(e.target.value)}
                   style={{ padding: 10, border: '1px solid #cbd5e1', borderRadius: 8, minWidth: 160 }}
                 />
                 <input
-                  placeholder="git remote URL"
+                  placeholder="git 远程仓库地址"
                   value={gitUrl}
                   onChange={e => setGitUrl(e.target.value)}
                   style={{
@@ -638,7 +638,7 @@ export default function WorkspaceDetailPage() {
                   onClick={async () => {
                     try {
                       await createMarketplace({
-                        name: mktName || 'Git skills',
+                        name: mktName || 'Git 技能',
                         type: 'git',
                         config: { remoteUrl: gitUrl, branch: 'main', skillsRoot: 'skills' },
                       });
@@ -647,7 +647,7 @@ export default function WorkspaceDetailPage() {
                       setMktName('');
                       setErr(null);
                     } catch (e: unknown) {
-                      setErr(e instanceof Error ? e.message : 'Failed');
+                      setErr(e instanceof Error ? e.message : '失败');
                     }
                   }}
                   style={{
@@ -665,13 +665,13 @@ export default function WorkspaceDetailPage() {
               </div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 <input
-                  placeholder="nacos serverAddr"
+                  placeholder="nacos 服务地址"
                   value={nacosAddr}
                   onChange={e => setNacosAddr(e.target.value)}
                   style={{ padding: 10, border: '1px solid #cbd5e1', borderRadius: 8, minWidth: 200 }}
                 />
                 <input
-                  placeholder="skillNames comma-separated"
+                  placeholder="skillNames，逗号分隔"
                   value={nacosSkills}
                   onChange={e => setNacosSkills(e.target.value)}
                   style={{
@@ -686,7 +686,7 @@ export default function WorkspaceDetailPage() {
                   onClick={async () => {
                     try {
                       await createMarketplace({
-                        name: mktName || 'Nacos skills',
+                        name: mktName || 'Nacos 技能',
                         type: 'nacos',
                         config: {
                           serverAddr: nacosAddr,
@@ -701,7 +701,7 @@ export default function WorkspaceDetailPage() {
                       setNacosSkills('');
                       setErr(null);
                     } catch (e: unknown) {
-                      setErr(e instanceof Error ? e.message : 'Failed');
+                      setErr(e instanceof Error ? e.message : '失败');
                     }
                   }}
                   style={{
@@ -720,7 +720,7 @@ export default function WorkspaceDetailPage() {
           </section>
 
           <section style={card}>
-            <h3 style={{ margin: '0 0 12px' }}>Installed registries</h3>
+            <h3 style={{ margin: '0 0 12px' }}>已安装的注册表</h3>
             {markets.map(m => (
               <div
                 key={m.id}
@@ -763,9 +763,9 @@ export default function WorkspaceDetailPage() {
           </>}
           {skillView === 'browse' && <>
           <section style={card}>
-            <h3 style={{ margin: '0 0 12px' }}>Browse & install into this workspace</h3>
+            <h3 style={{ margin: '0 0 12px' }}>浏览并安装到该 Workspace</h3>
             <select
-              aria-label="Marketplace source"
+              aria-label="市场来源"
               value={selectedMarket}
               onChange={async e => {
                 const mid = e.target.value;
@@ -780,7 +780,7 @@ export default function WorkspaceDetailPage() {
                 marginBottom: 12,
               }}
             >
-              <option value="">Select marketplace</option>
+              <option value="">选择市场</option>
               {markets.map(m => (
                 <option key={m.id} value={m.id}>
                   {m.name} ({m.type})
@@ -806,7 +806,7 @@ export default function WorkspaceDetailPage() {
                         await reloadMeta();
                         setErr(null);
                       } catch (e: unknown) {
-                        setErr(e instanceof Error ? e.message : 'Install failed');
+                        setErr(e instanceof Error ? e.message : '安装失败');
                       }
                     }}
                     style={{
@@ -818,7 +818,7 @@ export default function WorkspaceDetailPage() {
                       fontWeight: 600,
                     }}
                   >
-                    {skills.some(installed => installed.dirName === (sk.dirName || sk.name)) ? 'Already installed' : 'Install'}
+                    {skills.some(installed => installed.dirName === (sk.dirName || sk.name)) ? '已安装' : '安装'}
                   </button>
                 </div>
               ))}

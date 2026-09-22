@@ -128,7 +128,7 @@ export default function NewManagedSessionForm({
         setVaultIds(agent.defaultVaultIds ?? []);
         setMemoryStoreIds(agent.defaultMemoryStoreIds ?? []);
       } catch (e: unknown) {
-        if (!cancelled) setErr(e instanceof Error ? e.message : 'Failed to load form');
+        if (!cancelled) setErr(e instanceof Error ? e.message : '加载表单失败');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -153,7 +153,7 @@ export default function NewManagedSessionForm({
         setEnvironmentId(envId);
       }
       if (maxIters.trim() && Number.isNaN(Number(maxIters))) {
-        throw new Error('maxIters must be a number');
+        throw new Error('maxIters 必须是数字');
       }
       const agentOverrides: Record<string, unknown> = {};
       if (system.trim()) agentOverrides.system = system.trim();
@@ -169,7 +169,7 @@ export default function NewManagedSessionForm({
       });
       onCreated(session);
     } catch (ex: unknown) {
-      setErr(ex instanceof Error ? ex.message : 'Failed to create session');
+      setErr(ex instanceof Error ? ex.message : '创建 Session 失败');
     } finally {
       setSubmitting(false);
     }
@@ -177,35 +177,35 @@ export default function NewManagedSessionForm({
 
   const body = (
     <form onSubmit={handleSubmit} style={modal ? S.panel : undefined} onClick={ev => ev.stopPropagation()}>
-      <h3 style={S.title}>New session</h3>
+      <h3 style={S.title}>新建 Session</h3>
       <div style={S.hint}>
         Start with the Agent’s default environment and resource bindings. Send a message after creating the session to begin work.
       </div>
       {err && <div style={S.err}>{err}</div>}
       {loading ? (
-        <div style={S.empty}>Loading…</div>
+        <div style={S.empty}>加载中…</div>
       ) : (
         <>
           <button type="button" style={S.linkBtn} onClick={applyAgentDefaults}>
             Reset to Agent defaults
           </button>
-          <label style={S.field} htmlFor="session-environment">Environment</label>
+          <label style={S.field} htmlFor="session-environment">环境</label>
           <select
             style={S.input}
             id="session-environment"
             value={environmentId}
             onChange={e => setEnvironmentId(e.target.value)}
           >
-            <option value="">Automatic default</option>
+            <option value="">自动选择默认</option>
             {environments.map(env => (
               <option key={env.id} value={env.id}>{env.name} ({env.type})</option>
             ))}
           </select>
           <p style={S.hint}>Use the Agent’s default or choose an environment for this session. The environment type determines whether execution is local, remote, sandbox or self_hosted.</p>
 
-          <label style={S.field}>Vaults</label>
+          <label style={S.field}>Vault</label>
           {vaults.length === 0 ? (
-            <div style={S.empty}>No vaults. Create one under Agent Center → Vault.</div>
+            <div style={S.empty}>没有 Vault。请在 Agent Center → Vault 中创建。</div>
           ) : (
             <div style={S.checkGrid}>
               {vaults.map(v => {
@@ -226,9 +226,9 @@ export default function NewManagedSessionForm({
             </div>
           )}
 
-          <label style={S.field}>Memory stores</label>
+          <label style={S.field}>记忆库</label>
           {memoryStores.length === 0 ? (
-            <div style={S.empty}>No memory stores. Create one under Agent Center → Memory.</div>
+            <div style={S.empty}>没有记忆库。请在 Agent Center → 记忆 中创建。</div>
           ) : (
             <div style={S.checkGrid}>
               {memoryStores.map(m => {
@@ -251,7 +251,7 @@ export default function NewManagedSessionForm({
 
           {files.length > 0 && (
             <>
-              <label style={S.field}>File resources (optional)</label>
+              <label style={S.field}>文件资源（可选）</label>
               <div style={S.checkGrid}>
                 {files.map(f => {
                   const on = selectedFileIds.includes(f.id);
@@ -274,27 +274,27 @@ export default function NewManagedSessionForm({
           )}
 
           <details style={S.details}>
-            <summary style={S.summary}>Optional overrides</summary>
-            <label style={S.field}>System prompt</label>
+            <summary style={S.summary}>可选覆盖设置</summary>
+            <label style={S.field}>系统提示词</label>
             <textarea
               style={{ ...S.input, minHeight: 72, fontFamily: 'ui-monospace, Menlo, monospace' }}
               value={system}
               onChange={e => setSystem(e.target.value)}
-              placeholder="Leave empty to use agent default"
+              placeholder="留空则使用 Agent 默认值"
             />
-            <label style={S.field}>Model</label>
+            <label style={S.field}>模型</label>
             <input style={S.input} value={model} onChange={e => setModel(e.target.value)} placeholder="e.g. qwen-plus" />
-            <label style={S.field}>Max iters</label>
+            <label style={S.field}>最大迭代</label>
             <input style={S.input} value={maxIters} onChange={e => setMaxIters(e.target.value)} placeholder="e.g. 10" />
           </details>
         </>
       )}
       <div style={S.actions}>
         {onCancel && (
-          <button type="button" style={S.btn} onClick={onCancel} disabled={submitting}>Cancel</button>
+          <button type="button" style={S.btn} onClick={onCancel} disabled={submitting}>取消</button>
         )}
         <button type="submit" style={{ ...S.btn, ...S.primary }} disabled={loading || submitting}>
-          {submitting ? 'Creating…' : 'Create session'}
+          {submitting ? '创建中…' : '创建 Session'}
         </button>
       </div>
     </form>

@@ -162,7 +162,7 @@ export default function ShareAgentDialog({ agent, onClose }: Props) {
       }
       setGrants(await listShares(agent.id));
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed to update workspace grant');
+      setErr(e instanceof Error ? e.message : '更新 Workspace 授权失败');
     } finally {
       setBusy(false);
     }
@@ -171,7 +171,7 @@ export default function ShareAgentDialog({ agent, onClose }: Props) {
   async function addUserGrant() {
     const granteeId = newGrantee.trim();
     if (!granteeId) {
-      setErr('Pick a user');
+      setErr('选择用户');
       return;
     }
     setBusy(true);
@@ -181,7 +181,7 @@ export default function ShareAgentDialog({ agent, onClose }: Props) {
       setGrants(await listShares(agent.id));
       setNewGrantee('');
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed to add grant');
+      setErr(e instanceof Error ? e.message : '添加授权失败');
     } finally {
       setBusy(false);
     }
@@ -194,7 +194,7 @@ export default function ShareAgentDialog({ agent, onClose }: Props) {
       await revokeShare(agent.id, granteeType, granteeId);
       setGrants(await listShares(agent.id));
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed to revoke');
+      setErr(e instanceof Error ? e.message : '吊销失败');
     } finally {
       setBusy(false);
     }
@@ -205,16 +205,16 @@ export default function ShareAgentDialog({ agent, onClose }: Props) {
       <div style={S.modal} onClick={e => e.stopPropagation()}>
         <div style={S.header}>
           <h2 style={S.title}>↗ Share "{agent.name}"</h2>
-          <button style={S.iconBtn} onClick={onClose}>Close</button>
+          <button style={S.iconBtn} onClick={onClose}>关闭</button>
         </div>
 
         <div style={S.body}>
           {loading ? (
-            <div style={S.empty}>Loading…</div>
+            <div style={S.empty}>加载中…</div>
           ) : (
             <>
               <section>
-                <div style={S.sectionLabel}>Entire workspace</div>
+                <div style={S.sectionLabel}>整个 Workspace</div>
                 <div style={S.workspaceRow}>
                   <span style={{ flex: 1, fontSize: '0.92rem', color: '#475569' }}>
                     Every logged-in user
@@ -242,12 +242,12 @@ export default function ShareAgentDialog({ agent, onClose }: Props) {
               </section>
 
               <section>
-                <div style={S.sectionLabel}>Add user</div>
+                <div style={S.sectionLabel}>添加用户</div>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <input
                     style={S.input}
                     list={admin ? 'share-user-list' : undefined}
-                    placeholder={admin ? 'Pick or type a userId' : 'Enter a userId'}
+                    placeholder={admin ? '选择或输入 userId' : '输入 userId'}
                     value={newGrantee}
                     onChange={e => setNewGrantee(e.target.value)}
                   />
@@ -284,9 +284,9 @@ export default function ShareAgentDialog({ agent, onClose }: Props) {
               </section>
 
               <section>
-                <div style={S.sectionLabel}>Granted to users</div>
+                <div style={S.sectionLabel}>已授权用户</div>
                 {userGrants.length === 0 ? (
-                  <div style={S.empty}>No per-user grants yet.</div>
+                  <div style={S.empty}>暂无按用户的授权。</div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {userGrants.map(g => (
@@ -299,7 +299,7 @@ export default function ShareAgentDialog({ agent, onClose }: Props) {
                           style={S.iconBtn}
                           onClick={() => revoke('USER', g.granteeId)}
                           disabled={busy}
-                          title="Revoke"
+                          title="吊销"
                         >
                           ✕
                         </button>

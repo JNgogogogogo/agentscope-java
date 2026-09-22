@@ -51,7 +51,7 @@ export function RunBadge({ run }: { run: AutomationRun }) {
       }
     >
       {run.version === 0 && run.status === "completed"
-        ? "Dispatched (legacy)"
+        ? "已派发（旧版）"
         : runLabel(run.status, run.waitReason)}
     </Badge>
   );
@@ -81,7 +81,7 @@ export function RunDetail({
   if (!detail.data)
     return (
       <WorkEmpty
-        title="Run could not be loaded"
+        title="无法加载 Run"
         description={automationError(detail.error)}
       />
     );
@@ -150,7 +150,7 @@ export function RunDetail({
       {run.waitReason && (
         <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
           {run.waitReason === "review"
-            ? "Execution finished. Open the issue to review and accept the result."
+            ? "执行已完成。打开 Issue 查看并验收结果。"
             : `Waiting: ${run.waitReason}`}
         </p>
       )}
@@ -160,7 +160,7 @@ export function RunDetail({
           to={`/work/issues/${issue.id}?${scopeQuery}`}
         >
           {issue.visibility === "operational"
-            ? "Open execution record"
+            ? "打开执行记录"
             : `Open issue: ${issue.title}`}
         </Link>
       )}
@@ -173,7 +173,7 @@ export function RunDetail({
         </Link>
       )}
       <section>
-        <h3 className="mb-2 text-sm font-semibold">Result</h3>
+        <h3 className="mb-2 text-sm font-semibold">结果</h3>
         {run.output != null ? (
           <pre className="max-h-[480px] overflow-auto whitespace-pre-wrap break-words rounded-xl border border-slate-200 p-4 text-sm leading-6">
             {displayValue(run.output)}
@@ -181,14 +181,14 @@ export function RunDetail({
         ) : (
           <p className="text-sm text-slate-500">
             {terminalRun(run.status)
-              ? "No result was produced."
-              : "The result will appear here when work is available."}
+              ? "未产生结果。"
+              : "有结果时会显示在这里。"}
           </p>
         )}
       </section>
       {!!tasks?.length && (
         <section>
-          <h3 className="mb-2 text-sm font-semibold">Tasks</h3>
+          <h3 className="mb-2 text-sm font-semibold">任务</h3>
           <div className="divide-y rounded-xl border border-slate-200">
             {tasks.map((task) => (
               <div
@@ -212,7 +212,7 @@ export function RunDetail({
       )}
       {!!artifacts?.length && (
         <section>
-          <h3 className="mb-2 text-sm font-semibold">Artifacts</h3>
+          <h3 className="mb-2 text-sm font-semibold">产物</h3>
           {artifacts.map((artifact) => (
             <div className="text-sm" key={artifact.id}>
               {artifact.filename}
@@ -236,7 +236,7 @@ export function RunDetail({
           <p className="text-xs text-slate-500">
             {run.snapshot
               ? `Configuration version ${run.snapshot.version}`
-              : "This older run has no configuration snapshot."}
+              : "这个较早的 Run 没有配置快照。"}
           </p>
           {run.snapshot?.execution?.runbook && (
             <pre className="whitespace-pre-wrap rounded-lg bg-slate-50 p-4 text-sm">

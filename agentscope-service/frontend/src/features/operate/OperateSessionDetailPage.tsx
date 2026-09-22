@@ -195,7 +195,7 @@ export default function OperateSessionDetailPage() {
   if (session.isError) {
     return (
       <Page>
-        <EmptyState title="Session not found" description={String(session.error)} />
+        <EmptyState title="未找到 Session" description={String(session.error)} />
       </Page>
     );
   }
@@ -227,13 +227,13 @@ export default function OperateSessionDetailPage() {
     <Page>
       <div>
         <Link to={scope.scopedPath(agentId ? `/agent-center/agents/${encodeURIComponent(agentId)}?tab=activity&view=sessions` : '/work/sessions')} className="text-sm text-muted-foreground hover:text-foreground">
-          ← {agentId ? 'Agent activity' : 'Sessions'}
+          ← {agentId ? 'Agent 活动' : 'Session'}
         </Link>
         <PageHeader
           className="mt-2"
           title={sessionId}
           description={`${s?.agentName}${scope.selectorVisible ? ` · ${s?.namespace}` : ''} · ${s?.framework || 'framework n/a'}${contractLevel ? ` · L${contractLevel}` : ''}${selectedTurnIndex != null ? ` · turn #${selectedTurnIndex}` : ''}`}
-          actions={agentScopedReadOnly ? <Badge tone="info">Agent-scoped · read only</Badge> : (
+          actions={agentScopedReadOnly ? <Badge tone="info">Agent 作用域 · 只读</Badge> : (
             <>
               <CapabilityGate contractLevel={contractLevel} capabilities={capabilities} action="compress">
                 {(enabled, tip) =>
@@ -248,7 +248,7 @@ export default function OperateSessionDetailPage() {
                       }}
                     />
                   ) : (
-                    <DisabledAction label="Compress" tip={tip} />
+                    <DisabledAction label="压缩" tip={tip} />
                   )
                 }
               </CapabilityGate>
@@ -280,7 +280,7 @@ export default function OperateSessionDetailPage() {
                     </Button>
                   ) : (
                     <DisabledAction
-                      label="Abort turn"
+                      label="中止本轮"
                       tip={readOnlyOps ? `Session is ${phase}` : tip}
                     />
                   )
@@ -335,14 +335,14 @@ export default function OperateSessionDetailPage() {
         className="min-h-[42rem] max-h-[78vh]"
         messages={runtimeEventsToMessages(eventTimeline.events)}
         events={runtimeEventsToConversation(eventTimeline.events)}
-        source="event stream"
+        source="事件流"
         loading={eventTimeline.loading}
         error={eventTimeline.error || (sendMessage.error instanceof Error
           ? sendMessage.error.message
           : sendMessage.error
             ? String(sendMessage.error)
             : null)}
-        emptyMessage="No conversation messages have been recorded for this session."
+        emptyMessage="该 Session 尚未记录任何对话消息。"
         hasEarlierMessages={eventTimeline.hasEarlier}
         loadingEarlierMessages={eventTimeline.loadingEarlier}
         onLoadEarlierMessages={() => void eventTimeline.loadEarlier()}
@@ -356,14 +356,14 @@ export default function OperateSessionDetailPage() {
             await sendMessage.mutateAsync(content);
           },
           busy: sendMessage.isPending,
-          placeholder: 'Send a message to this session…',
+          placeholder: '给该 Session 发送消息…',
         } : undefined}
       />
 
       <Card>
         <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
           <div>
-            <CardTitle>Context</CardTitle>
+            <CardTitle>上下文</CardTitle>
             <CardDescription>
               Inspect the instructions, tools and messages available to the next model call.
             </CardDescription>
@@ -379,19 +379,19 @@ export default function OperateSessionDetailPage() {
         </CardHeader>
         <CardContent>
           {!sessionReady || session.isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading…</p>
+            <p className="text-sm text-muted-foreground">加载中…</p>
           ) : !canQueryContext(capabilities) ? (
             <p className="text-sm text-muted-foreground">This runtime does not provide a context inspection capability.</p>
           ) : context.isError ? (
-            <p className="text-sm text-red-600">Failed to load context.</p>
+            <p className="text-sm text-red-600">加载上下文失败。</p>
           ) : context.isLoading || (context.isFetching && !context.data) ? (
-            <p className="text-sm text-muted-foreground">Loading…</p>
+            <p className="text-sm text-muted-foreground">加载中…</p>
           ) : !context.data || !ctxSummary ? (
-            <p className="text-sm text-muted-foreground">No context.</p>
+            <p className="text-sm text-muted-foreground">无上下文。</p>
           ) : (
             <div className="flex flex-wrap items-center gap-2">
               {ctxSummary.isCompacted && <Badge tone="warning">compacted</Badge>}
-              {ctxSummary.planActive && <Badge tone="info">plan mode</Badge>}
+              {ctxSummary.planActive && <Badge tone="info">计划模式</Badge>}
               {ctxSummary.model && <Badge tone="info">{ctxSummary.model}</Badge>}
               <span className="text-sm text-muted-foreground">
                 {ctxSummary.messageCount} effective msgs
@@ -408,7 +408,7 @@ export default function OperateSessionDetailPage() {
       <Dialog open={contextOpen} onOpenChange={setContextOpen}>
         <DialogContent size="xl">
           <DialogHeader>
-            <DialogTitle>Context</DialogTitle>
+            <DialogTitle>上下文</DialogTitle>
             <DialogDescription>
               View the latest reported model context, including instructions, tools and messages.
             </DialogDescription>
@@ -417,7 +417,7 @@ export default function OperateSessionDetailPage() {
             <ContextPanel
               data={context.data}
               unavailableReason={
-                !canQueryContext(capabilities) ? 'This runtime does not provide a context inspection capability.' : undefined
+                !canQueryContext(capabilities) ? '该运行时未提供上下文检查能力。' : undefined
               }
               error={context.isError}
               loading={context.isLoading}
@@ -429,15 +429,15 @@ export default function OperateSessionDetailPage() {
       {canQueryTasks(capabilities) && (
         <Card>
           <CardHeader>
-            <CardTitle>Todo</CardTitle>
+            <CardTitle>待办</CardTitle>
           </CardHeader>
           <CardContent>
             {tasks.isError ? (
-              <p className="text-sm text-muted-foreground">Todo endpoint unavailable.</p>
+              <p className="text-sm text-muted-foreground">待办接口不可用。</p>
             ) : tasks.isLoading ? (
-              <p className="text-sm text-muted-foreground">Loading…</p>
+              <p className="text-sm text-muted-foreground">加载中…</p>
             ) : taskList.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No todos.</p>
+              <p className="text-sm text-muted-foreground">暂无待办。</p>
             ) : (
               <div className="space-y-2.5">
                 {taskList.map((t, i) => {
@@ -461,15 +461,15 @@ export default function OperateSessionDetailPage() {
       {canQuerySubagentTasks(capabilities) && (
         <Card>
           <CardHeader>
-            <CardTitle>Background tasks</CardTitle>
+            <CardTitle>后台任务</CardTitle>
           </CardHeader>
           <CardContent>
             {subagentTasks.isError ? (
-              <p className="text-sm text-muted-foreground">Background tasks unavailable.</p>
+              <p className="text-sm text-muted-foreground">后台任务不可用。</p>
             ) : subagentTasks.isLoading ? (
-              <p className="text-sm text-muted-foreground">Loading…</p>
+              <p className="text-sm text-muted-foreground">加载中…</p>
             ) : bgTaskList.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No background subagent tasks.</p>
+              <p className="text-sm text-muted-foreground">没有后台 Subagent 任务。</p>
             ) : (
               <div className="space-y-2.5">
                 {bgTaskList.map((t, i) => (
@@ -497,7 +497,7 @@ export default function OperateSessionDetailPage() {
             onClick={() => setCommandsOpen((v) => !v)}
           >
             <span className="font-mono text-muted-foreground">{commandsOpen ? '▾' : '▸'}</span>
-            <CardTitle className="text-base">Commands</CardTitle>
+            <CardTitle className="text-base">命令</CardTitle>
             <span className="text-sm text-muted-foreground">
               {(commands.data?.commands || []).length} command
               {(commands.data?.commands || []).length === 1 ? '' : 's'}

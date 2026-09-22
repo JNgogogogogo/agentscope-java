@@ -90,7 +90,7 @@ export default function SessionDetailPage() {
       .catch(e => {
         if (!cancelled) {
           setSession(null);
-          setErr(e instanceof Error ? e.message : 'Failed to load session');
+          setErr(e instanceof Error ? e.message : '加载对话失败');
         }
       })
       .finally(() => { if (!cancelled) setLoading(false); });
@@ -105,20 +105,20 @@ export default function SessionDetailPage() {
   }
 
   if (!sessionId) {
-    return <div style={S.err}>Missing session id. <Link to="/managed/sessions">Back to conversations</Link></div>;
+    return <div style={S.err}>缺少 Session ID。<Link to="/managed/sessions">返回对话列表</Link></div>;
   }
 
   if (loading) {
-    return <div style={S.loading}>Loading session…</div>;
+    return <div style={S.loading}>正在加载 Session…</div>;
   }
 
   if (err || !session) {
     return (
       <div style={S.err}>
-        {err || 'Session not found.'}{' '}
-        <Link to="/managed/sessions">Back to conversations</Link>
+        {err || '未找到 Session。'}{' '}
+        <Link to="/managed/sessions">返回对话列表</Link>
         {' · '}
-        <Link to="/managed/sessions/new">Create conversation</Link>
+        <Link to="/managed/sessions/new">新建对话</Link>
       </div>
     );
   }
@@ -131,8 +131,8 @@ export default function SessionDetailPage() {
       <div style={S.bar}>
         <button
           type="button"
-          aria-label="Back to previous page"
-          title="Back to previous page"
+          aria-label="返回上一页"
+          title="返回上一页"
           onClick={() => navigate(-1)}
           style={{ ...S.back, border: 0, background: 'transparent', padding: 0, cursor: 'pointer' }}
         >
@@ -141,7 +141,7 @@ export default function SessionDetailPage() {
         <h1 style={S.title}>Session</h1>
         <span style={S.meta} title={session.id}>{session.id}</span>
         {fromTask && (
-          <span style={S.teamTag} title={session.externalKey || undefined}>AgentTask</span>
+          <span style={S.teamTag} title={session.externalKey || undefined}>Agent 任务</span>
         )}
         <span style={{ flex: 1 }} />
         <div style={S.tabs}>

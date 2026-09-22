@@ -140,7 +140,7 @@ export function InvocationPlayground({
       .then(({ items }) => {
         const credential = selectEndpointTestCredential(items);
         if (!credential) {
-          throw new Error('No active recoverable API credential is available. Create or rotate one in Security, or enter a key below.');
+          throw new Error('没有可用的 API 凭据。请在「安全」中创建或轮换一个，或在下方输入 key。');
         }
         return revealEndpointCredential(endpointId, credential.id)
           .then(({ secret }) => ({ secret, name: credential.name }));
@@ -151,7 +151,7 @@ export function InvocationPlayground({
         setCredentialName(name);
       })
       .catch((cause) => {
-        if (!cancelled) setCredentialError(cause instanceof Error ? cause.message : 'Unable to load an Endpoint credential automatically.');
+        if (!cancelled) setCredentialError(cause instanceof Error ? cause.message : '无法自动加载 Endpoint 凭据。');
       })
       .finally(() => {
         if (!cancelled) setCredentialLoading(false);
@@ -168,7 +168,7 @@ export function InvocationPlayground({
 		const attemptFailure = [...graph.attempts].reverse().find(attempt => attempt.failureMessage);
 		const failure = attemptFailure?.failureMessage || graph.run.failureMessage;
 		const content = taskResult || attemptResult || runResult || failure ||
-			(graph.run.state === 'succeeded' ? 'Job completed without text output.' : `Job finished with state ${graph.run.state}.`);
+			(graph.run.state === 'succeeded' ? '任务完成但没有文本输出。' : `Job finished with state ${graph.run.state}.`);
 		const failed = graph.run.state === 'failed' || graph.run.state === 'cancelled';
 		setLocalMessages(current => [...current, {
 			id: `playground-job-${jobRunId}`,
@@ -219,7 +219,7 @@ export function InvocationPlayground({
       setMessage('');
       onInvoked?.();
     } catch (cause) {
-      const failure = cause instanceof Error ? cause.message : 'Invocation failed';
+      const failure = cause instanceof Error ? cause.message : '调用失败';
       setError(failure);
       setLocalMessages((current) => [...current, {
         id: `playground-error-${Date.now()}`,
@@ -257,59 +257,59 @@ export function InvocationPlayground({
   return <Card>
     <CardHeader>
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div><CardTitle className="flex items-center gap-2"><Play className="h-4 w-4" />Test published API</CardTitle><CardDescription>Exercise the published API through its real Gateway authentication, schema, rate limit, and release.</CardDescription></div>
+        <div><CardTitle className="flex items-center gap-2"><Play className="h-4 w-4" />测试已发布的 API</CardTitle><CardDescription>通过真实的 Gateway 鉴权、Schema、速率限制与发布版本演练已发布的 API。</CardDescription></div>
         <Badge>public route</Badge>
       </div>
     </CardHeader>
     <CardContent className="grid gap-4">
-        <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/30 p-3 text-sm"><span className="text-muted-foreground">Target</span><strong>{endpoint.name}</strong><Badge>endpoint</Badge></div>
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/30 p-3 text-sm"><span className="text-muted-foreground">目标</span><strong>{endpoint.name}</strong><Badge>endpoint</Badge></div>
         {endpointAuthType === 'api_key' && <label className="grid gap-1 text-sm">
           API credential
           <Input
             type="password"
             value={apiKey}
             onChange={event => { setApiKey(event.target.value); setCredentialName(''); }}
-            placeholder={credentialLoading ? 'Loading credential…' : 'Endpoint API key'}
+            placeholder={credentialLoading ? '正在加载凭据…' : 'Endpoint API Key'}
           />
           <span className={`text-xs ${credentialError ? 'text-amber-700' : 'text-muted-foreground'}`}>
             {credentialLoading
-              ? 'Loading the latest active credential from Endpoint Security…'
+              ? '正在从 Endpoint 的「安全」中加载最新的可用凭据…'
               : credentialName
                 ? `Using “${credentialName}” from Endpoint Security automatically.`
-                : credentialError || 'Enter an Endpoint API key.'}
+                : credentialError || '请输入 Endpoint API Key。'}
           </span>
         </label>}
         {endpointAuthType === 'platform' && <div className="rounded-lg border bg-muted/30 p-3 text-sm">
-          <div className="font-medium">Console credential</div>
-          <p className="mt-1 text-xs text-muted-foreground">The current signed-in credential is used automatically for this Platform-authenticated Endpoint.</p>
+          <div className="font-medium">控制台凭据</div>
+          <p className="mt-1 text-xs text-muted-foreground">该 Endpoint 使用平台鉴权，会自动使用当前登录凭据。</p>
         </div>}
-        {(sessionId || endpointConversationId) && mode === 'conversation' && <div className="flex flex-wrap items-center gap-2 rounded-lg bg-sky-50 p-3 text-xs text-sky-900">Continuing session <code>{sessionId || endpointConversationId}</code><Button type="button" size="sm" variant="ghost" onClick={resetConversation}><RotateCcw className="h-3 w-3" />Start new</Button></div>}
+        {(sessionId || endpointConversationId) && mode === 'conversation' && <div className="flex flex-wrap items-center gap-2 rounded-lg bg-sky-50 p-3 text-xs text-sky-900">继续的 Session <code>{sessionId || endpointConversationId}</code><Button type="button" size="sm" variant="ghost" onClick={resetConversation}><RotateCcw className="h-3 w-3" />新建</Button></div>}
         {error && <p className="text-sm text-red-600">{error}</p>}
-        {!canInvoke && <p className="text-sm text-amber-700">Your Agent Center access is read-only. Agent developer or administrator permission is required to invoke tests.</p>}
-        {endpoint.status !== 'published' && <span className="text-xs text-amber-700">Publish the Endpoint before invoking it.</span>}
+        {!canInvoke && <p className="text-sm text-amber-700">你对 Agent Center 的访问是只读的。发起测试调用需要 Agent 开发者或管理员权限。</p>}
+        {endpoint.status !== 'published' && <span className="text-xs text-amber-700">调用前请先发布该 Endpoint。</span>}
 		{jobRunId && <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-muted/30 p-3 text-sm">
-			<span className="text-muted-foreground">Hosted job</span>
+			<span className="text-muted-foreground">托管任务</span>
 			<Badge tone={jobGraph.data?.run.state === 'failed' ? 'danger' : isTerminalRun(jobGraph.data) ? 'success' : 'info'}>{jobGraph.data?.run.state ?? 'submitted'}</Badge>
-			{latestAttempt && <><span className="text-muted-foreground">Attempt</span><code>{latestAttempt.id.slice(0, 8)}</code><Badge>{latestAttempt.state}</Badge></>}
-			{latestAttempt?.providerSessionId && <><span className="text-muted-foreground">Provider session</span><code>{latestAttempt.providerSessionId.slice(0, 12)}</code></>}
-			<span className="ml-auto text-xs text-muted-foreground">{jobActive ? 'Live updates every 1.5s' : 'Polling stopped'}</span>
+			{latestAttempt && <><span className="text-muted-foreground">尝试</span><code>{latestAttempt.id.slice(0, 8)}</code><Badge>{latestAttempt.state}</Badge></>}
+			{latestAttempt?.providerSessionId && <><span className="text-muted-foreground">服务商 Session</span><code>{latestAttempt.providerSessionId.slice(0, 12)}</code></>}
+			<span className="ml-auto text-xs text-muted-foreground">{jobActive ? '每 1.5 秒实时更新' : '轮询已停止'}</span>
 		</div>}
         <ConversationSurface
           className="min-h-[36rem] max-h-[72vh]"
           messages={displayedMessages}
           events={displayedEvents}
-          source={sessionRef ? 'event stream' : 'API test'}
+          source={sessionRef ? '事件流' : 'API 测试'}
 		  loading={timeline.loading || (!!jobRunId && jobGraph.isLoading)}
 		  error={timeline.error || (jobGraph.error instanceof Error ? jobGraph.error.message : '')}
-          emptyMessage="Send a message to start a test conversation."
-          headerActions={result && <div className="flex flex-wrap gap-2">{typeof result.issueId === 'string' && <Button asChild size="sm" variant="outline"><Link to={scope.scopedPath(`/work/issues/${result.issueId}`)}>Issue<ExternalLink className="h-3 w-3" /></Link></Button>}{typeof result.runId === 'string' && <Button asChild size="sm" variant="outline"><Link to={scope.scopedPath(`/work/executions/${result.runId}`)}>Execution<ExternalLink className="h-3 w-3" /></Link></Button>}{(typeof result.sessionRef === 'string' || typeof result.sessionId === 'string') && <Button asChild size="sm" variant="outline"><Link to={scope.scopedPath(`/work/sessions/${String(result.sessionRef || result.sessionId)}`)}>Session<ExternalLink className="h-3 w-3" /></Link></Button>}</div>}
+          emptyMessage="发送一条消息开始测试对话。"
+          headerActions={result && <div className="flex flex-wrap gap-2">{typeof result.issueId === 'string' && <Button asChild size="sm" variant="outline"><Link to={scope.scopedPath(`/work/issues/${result.issueId}`)}>Issue<ExternalLink className="h-3 w-3" /></Link></Button>}{typeof result.runId === 'string' && <Button asChild size="sm" variant="outline"><Link to={scope.scopedPath(`/work/executions/${result.runId}`)}>执行<ExternalLink className="h-3 w-3" /></Link></Button>}{(typeof result.sessionRef === 'string' || typeof result.sessionId === 'string') && <Button asChild size="sm" variant="outline"><Link to={scope.scopedPath(`/work/sessions/${String(result.sessionRef || result.sessionId)}`)}>Session<ExternalLink className="h-3 w-3" /></Link></Button>}</div>}
           composer={{
             value: message,
             onChange: setMessage,
             onSubmit: submit,
 			busy: submitting || jobActive,
 			disabled: jobActive || credentialLoading || !canInvoke || endpoint.status !== 'published' || (endpointAuthType === 'api_key' && !apiKey),
-            placeholder: mode === 'job' ? 'Describe the job to run…' : 'Send a message…',
+            placeholder: mode === 'job' ? '描述要运行的任务…' : '发送消息…',
           }}
           hasEarlierMessages={timeline.hasEarlier}
           loadingEarlierMessages={timeline.loadingEarlier}

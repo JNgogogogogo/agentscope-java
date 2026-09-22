@@ -89,15 +89,15 @@ export default function TeamDetailPage() {
   if (detail.isLoading)
     return (
       <Page>
-        <p className="text-sm text-muted-foreground">Loading Team…</p>
+        <p className="text-sm text-muted-foreground">正在加载 Team…</p>
       </Page>
     );
   if (!detail.data)
     return (
       <Page>
         <EmptyState
-          title="Team unavailable"
-          description={String(detail.error || "The Team could not be loaded.")}
+          title="Team 不可用"
+          description={String(detail.error || "无法加载该 Team。")}
         />
       </Page>
     );
@@ -105,9 +105,9 @@ export default function TeamDetailPage() {
   const records = activity.data?.records || [];
   const missing = activity.data?.missingRuns || 0;
   const warning = missing
-    ? `${missing} Run statuses could not be loaded. These records remain visible as status unavailable; summary counts are incomplete.`
+    ? `${missing} 个 Run 状态无法加载。这些记录会以"状态不可用"展示，汇总计数不完整。`
     : activity.data?.missingIssues
-      ? "Some Issue titles could not be loaded. Execution records are still available."
+      ? "部分 Issue 标题无法加载。执行记录仍然可用。"
       : undefined;
   const metric = (kind: ActivityFilter) =>
     activity.isLoading || !activity.data || activity.isError || missing
@@ -120,7 +120,7 @@ export default function TeamDetailPage() {
         className="inline-flex items-center self-start text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        Teams
+        Team
       </Link>
       <PageHeader
         title={
@@ -133,7 +133,7 @@ export default function TeamDetailPage() {
           </span>
         }
         description={
-          team.description || "A team of Agents coordinated by a Lead."
+          team.description || "由 Lead 协调的 Agent 团队。"
         }
         actions={
           <Button
@@ -143,7 +143,7 @@ export default function TeamDetailPage() {
             disabled={detail.isFetching || activity.isFetching}
           >
             <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh
+            刷新
           </Button>
         }
       />
@@ -154,12 +154,12 @@ export default function TeamDetailPage() {
             <AgentIdentity agentId={team.leaderAgentId} showId={false} />
           </span>
         </span>
-        <span>{team.members?.length || 0} workers</span>
-        <span>{overview.endpoints.published} published APIs</span>
+        <span>{team.members?.length || 0} 个 worker</span>
+        <span>已发布 {overview.endpoints.published} 个 API</span>
         <span>{overview.reason}</span>
       </div>
       <nav
-        aria-label="Team sections"
+        aria-label="Team 分区"
         className="flex gap-1 overflow-x-auto border-b border-border"
       >
         {tabs.map(([key, label]) => (
@@ -175,27 +175,27 @@ export default function TeamDetailPage() {
       </nav>
       {detail.isError && (
         <p role="alert" className="text-sm text-destructive">
-          Team information could not refresh: {String(detail.error)}
+          Team 信息刷新失败：{String(detail.error)}
         </p>
       )}
       {(tab === "overview" || tab === "activity") && (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {[
-            ["active", "In progress", "Collaborations still open"],
+            ["active", "进行中", "仍在进行的协作"],
             [
               "attention",
-              "Needs attention",
-              "Failures, partial results or waiting",
+              "需要关注",
+              "失败、部分结果或等待中",
             ],
             [
               "completed",
-              "Succeeded · 24h",
-              "Completed successfully in the last day",
+              "成功 · 24h",
+              "最近 24 小时成功完成",
             ],
             [
               "all",
-              "Recorded collaborations",
-              "Execution Runs with Team participation",
+              "已记录的协作",
+              "有 Team 参与的 Execution Run",
             ],
           ].map(([key, label, help]) => (
             <button
@@ -226,7 +226,7 @@ export default function TeamDetailPage() {
               compact
             />
             <Button variant="outline" onClick={() => selectTab("activity")}>
-              View all activity
+              查看全部活动
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -234,10 +234,10 @@ export default function TeamDetailPage() {
             <TeamStructure team={team} overview={overview} compact />
             <Card>
               <CardContent className="pt-5">
-                <p className="text-sm font-medium">How this Team works</p>
+                <p className="text-sm font-medium">这个 Team 如何工作</p>
                 <p className="mt-2 line-clamp-4 whitespace-pre-wrap text-sm text-muted-foreground">
                   {team.instructions ||
-                    "The Lead receives requests, delegates work when needed and brings the results together."}
+                    "Lead 接收请求，按需分派工作，并汇总结果。"}
                 </p>
                 <Button
                   className="mt-3"
@@ -245,7 +245,7 @@ export default function TeamDetailPage() {
                   variant="outline"
                   onClick={() => selectTab("orchestration")}
                 >
-                  View orchestration
+                  查看编排
                 </Button>
               </CardContent>
             </Card>

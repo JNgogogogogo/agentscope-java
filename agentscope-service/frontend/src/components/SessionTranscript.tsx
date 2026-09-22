@@ -134,7 +134,7 @@ export default function SessionTranscript({
       setModel(typeof ov.model === 'string' ? ov.model : '');
       setMaxIters(ov.maxIters != null ? String(ov.maxIters) : '');
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed');
+      setErr(e instanceof Error ? e.message : '失败');
     }
   }
 
@@ -144,12 +144,12 @@ export default function SessionTranscript({
   }, [agentId, sessionId]);
 
   async function handleArchiveManaged() {
-    if (!confirm('Archive this managed session?')) return;
+    if (!confirm('归档这个托管 Session？')) return;
     try {
       await archiveManagedSession(sessionId);
       await reload();
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed');
+      setErr(e instanceof Error ? e.message : '失败');
     }
   }
 
@@ -158,18 +158,18 @@ export default function SessionTranscript({
       await restoreManagedSession(sessionId);
       await reload();
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed');
+      setErr(e instanceof Error ? e.message : '失败');
     }
   }
 
   async function handleDelete() {
-    if (!confirm('Delete this session entirely?')) return;
+    if (!confirm('彻底删除该 Session？')) return;
     try {
       await deleteManagedSession(sessionId);
       if (onDeleted) onDeleted();
       else navigate(`/managed/sessions?agentId=${encodeURIComponent(agentId)}`, { replace: true });
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed');
+      setErr(e instanceof Error ? e.message : '失败');
     }
   }
 
@@ -185,12 +185,12 @@ export default function SessionTranscript({
         maxIters: maxIters.trim() ? Number(maxIters) : null,
       };
       if (maxIters.trim() && Number.isNaN(Number(maxIters))) {
-        throw new Error('maxIters must be a number');
+        throw new Error('maxIters 必须是数字');
       }
       const updated = await updateManagedSession(sessionId, { agentOverrides });
       setManagedSession(updated);
     } catch (ex: unknown) {
-      setErr(ex instanceof Error ? ex.message : 'Failed to save overrides');
+      setErr(ex instanceof Error ? ex.message : '保存覆盖设置失败');
     } finally {
       setSavingOverrides(false);
     }
@@ -202,7 +202,7 @@ export default function SessionTranscript({
     setSavingMounts(true);
     setErr(null);
     try {
-      if (!environmentId.trim()) throw new Error('environmentId is required');
+      if (!environmentId.trim()) throw new Error('environmentId 为必填项');
       const updated = await updateManagedSession(sessionId, {
         environmentId: environmentId.trim(),
         vaultIds,
@@ -210,7 +210,7 @@ export default function SessionTranscript({
       });
       setManagedSession(updated);
     } catch (ex: unknown) {
-      setErr(ex instanceof Error ? ex.message : 'Failed to save mounts');
+      setErr(ex instanceof Error ? ex.message : '保存挂载失败');
     } finally {
       setSavingMounts(false);
     }
@@ -220,35 +220,35 @@ export default function SessionTranscript({
     <div style={S.root}>
       {!embedded && (
         <div style={S.bar}>
-          <button type="button" aria-label="Back to previous page" title="Back to previous page" onClick={() => navigate(-1)} style={S.back}>← Back</button>
-          <h2 style={S.title}>Details</h2>
+          <button type="button" aria-label="返回上一页" title="返回上一页" onClick={() => navigate(-1)} style={S.back}>← Back</button>
+          <h2 style={S.title}>详情</h2>
           <span style={{ flex: 1 }} />
           {!archived && (
             <Link
               to={`/managed/sessions/${encodeURIComponent(sessionId)}`}
               style={{ ...S.btn, ...S.primary }}
-              title="Open Chat for this session"
+              title="打开该 Session 的对话"
             >
               ▶ Open Chat
             </Link>
           )}
           {archived ? (
-            <button type="button" style={S.btn} onClick={handleRestoreManaged}>Restore</button>
+            <button type="button" style={S.btn} onClick={handleRestoreManaged}>恢复</button>
           ) : (
-            <button type="button" style={S.btn} onClick={handleArchiveManaged}>Archive</button>
+            <button type="button" style={S.btn} onClick={handleArchiveManaged}>归档</button>
           )}
-          <button type="button" style={{ ...S.btn, ...S.danger }} onClick={handleDelete}>Delete</button>
+          <button type="button" style={{ ...S.btn, ...S.danger }} onClick={handleDelete}>删除</button>
         </div>
       )}
       {embedded && (
         <div style={{ ...S.bar, marginBottom: 12 }}>
           <span style={{ flex: 1 }} />
           {archived ? (
-            <button type="button" style={S.btn} onClick={handleRestoreManaged}>Restore</button>
+            <button type="button" style={S.btn} onClick={handleRestoreManaged}>恢复</button>
           ) : (
-            <button type="button" style={S.btn} onClick={handleArchiveManaged}>Archive</button>
+            <button type="button" style={S.btn} onClick={handleArchiveManaged}>归档</button>
           )}
-          <button type="button" style={{ ...S.btn, ...S.danger }} onClick={handleDelete}>Delete</button>
+          <button type="button" style={{ ...S.btn, ...S.danger }} onClick={handleDelete}>删除</button>
         </div>
       )}
       <div style={S.meta}>
@@ -259,28 +259,28 @@ export default function SessionTranscript({
       {err && <div style={S.err}>{err}</div>}
 
       <div style={S.panel}>
-        <div style={S.panelTitle}>Mounts</div>
+        <div style={S.panelTitle}>挂载</div>
         <div style={S.hint}>
           {archived
-            ? 'Archived sessions are read-only. Restore to change mounts.'
-            : 'Applies on the next turn when the data plane resolves the session.'}
+            ? '已归档的 Session 为只读。恢复后才能修改挂载。'
+            : '在数据面解析该 Session 后的下一轮生效。'}
         </div>
         <form onSubmit={handleSaveMounts}>
-          <label style={S.field}>Environment</label>
+          <label style={S.field}>环境</label>
           <select
             style={S.input}
             value={environmentId}
             onChange={e => setEnvironmentId(e.target.value)}
             disabled={archived}
           >
-            <option value="">Select environment…</option>
+            <option value="">选择环境…</option>
             {environments.map(env => (
               <option key={env.id} value={env.id}>{env.name} ({env.type})</option>
             ))}
           </select>
-          <label style={S.field}>Vaults</label>
+          <label style={S.field}>Vault</label>
           <div style={S.checkGrid}>
-            {vaults.length === 0 && <div style={S.hint}>No vaults available.</div>}
+            {vaults.length === 0 && <div style={S.hint}>没有可用的 Vault。</div>}
             {vaults.map(v => {
               const on = vaultIds.includes(v.id);
               return (
@@ -298,9 +298,9 @@ export default function SessionTranscript({
               );
             })}
           </div>
-          <label style={S.field}>Memory stores</label>
+          <label style={S.field}>记忆库</label>
           <div style={S.checkGrid}>
-            {memoryStores.length === 0 && <div style={S.hint}>No memory stores available.</div>}
+            {memoryStores.length === 0 && <div style={S.hint}>没有可用的记忆库。</div>}
             {memoryStores.map(m => {
               const on = memoryStoreIds.includes(m.id);
               return (
@@ -320,25 +320,25 @@ export default function SessionTranscript({
           </div>
           {!archived && (
             <button type="submit" style={{ ...S.btn, ...S.primary }} disabled={savingMounts}>
-              {savingMounts ? 'Saving…' : 'Save mounts'}
+              {savingMounts ? '保存中…' : '保存挂载'}
             </button>
           )}
         </form>
       </div>
 
       <div style={S.panel}>
-        <div style={S.panelTitle}>Session overrides</div>
-        <div style={S.hint}>Applies on the next turn. Tools / MCP cannot be overridden here.</div>
+        <div style={S.panelTitle}>Session 覆盖设置</div>
+        <div style={S.hint}>在下一轮生效。此处无法覆盖工具 / MCP。</div>
         <form onSubmit={handleSaveOverrides}>
-          <label style={S.field}>System prompt</label>
+          <label style={S.field}>系统提示词</label>
           <textarea
             style={S.textarea}
             value={system}
             onChange={e => setSystem(e.target.value)}
-            placeholder="Leave empty to clear override"
+            placeholder="留空则清除覆盖"
             disabled={archived}
           />
-          <label style={S.field}>Model</label>
+          <label style={S.field}>模型</label>
           <input
             style={S.input}
             value={model}
@@ -346,7 +346,7 @@ export default function SessionTranscript({
             placeholder="e.g. qwen-plus"
             disabled={archived}
           />
-          <label style={S.field}>Max iters</label>
+          <label style={S.field}>最大迭代</label>
           <input
             style={S.input}
             value={maxIters}
@@ -356,7 +356,7 @@ export default function SessionTranscript({
           />
           {!archived && (
             <button type="submit" style={{ ...S.btn, ...S.primary }} disabled={savingOverrides}>
-              {savingOverrides ? 'Saving…' : 'Save overrides'}
+              {savingOverrides ? '保存中…' : '保存覆盖设置'}
             </button>
           )}
         </form>

@@ -37,26 +37,26 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
   const canOperate = admin || roles.includes('operator')
   const canAgentCenter = canOperate || roles.includes('agent_developer')
   const links = [
-    ['Overview', '/work/overview'],
-    ['Chat', '/work/chat'],
-    ['Issues', '/work/issues'],
+    ['概览', '/work/overview'],
+    ['对话', '/work/chat'],
+    ['Issue', '/work/issues'],
     ['Inbox', '/work/inbox'],
-    ['Automations', '/work/automations'],
+    ['Automation', '/work/automations'],
     ...(canAgentCenter ? [
-      ['Agents', '/agent-center/agents'],
-      ['Teams', '/agent-center/teams'],
-      ['Workflows', '/agent-center/workflows'],
-      ...(admin ? [['Channels', '/agent-center/entrypoints']] : []),
-      ['Workspaces', '/agent-center/workspaces'],
-      ['Environments', '/agent-center/environments'],
-      ['Memory', '/agent-center/memory'],
+      ['Agent', '/agent-center/agents'],
+      ['Team', '/agent-center/teams'],
+      ['Workflow', '/agent-center/workflows'],
+      ...(admin ? [['Channel', '/agent-center/entrypoints']] : []),
+      ['Workspace', '/agent-center/workspaces'],
+      ['环境', '/agent-center/environments'],
+      ['记忆', '/agent-center/memory'],
       ['Vault', '/agent-center/vaults'],
     ] : []),
   ]
   return (
     <div className="fixed inset-0 z-50 bg-black/30 p-6" onClick={() => onOpenChange(false)}>
       <div className="mx-auto max-w-lg rounded-xl bg-white p-4 shadow-xl" onClick={(event) => event.stopPropagation()}>
-        <div className="mb-3 font-semibold">Go to</div>
+        <div className="mb-3 font-semibold">前往</div>
         {links.map(([label, to]) => (
           <a key={to} href={to} className="block rounded-lg px-3 py-2 hover:bg-muted">
             {label}

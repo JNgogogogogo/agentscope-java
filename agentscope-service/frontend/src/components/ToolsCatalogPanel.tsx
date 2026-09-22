@@ -160,7 +160,7 @@ function BuiltinTab({ agentId, onSaved }: { agentId: string; onSaved: () => void
         setPolicies(next);
         setDirty(false);
       })
-      .catch(e => { if (!cancelled) setErr(e instanceof Error ? e.message : 'Failed'); })
+      .catch(e => { if (!cancelled) setErr(e instanceof Error ? e.message : '失败'); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [agentId]);
@@ -191,7 +191,7 @@ function BuiltinTab({ agentId, onSaved }: { agentId: string; onSaved: () => void
       setDirty(false);
       onSaved();
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Save failed');
+      setErr(e instanceof Error ? e.message : '保存失败');
     } finally {
       setSaving(false);
     }
@@ -220,7 +220,7 @@ function BuiltinTab({ agentId, onSaved }: { agentId: string; onSaved: () => void
   return (
     <>
       <div style={S.body}>
-        {loading && <div style={{ color: '#64748b' }}>Loading…</div>}
+        {loading && <div style={{ color: '#64748b' }}>加载中…</div>}
         {err && <div style={S.err}>{err}</div>}
         {!loading && Array.from(groups.entries()).map(([group, items]) => (
           <div key={group}>
@@ -243,10 +243,10 @@ function BuiltinTab({ agentId, onSaved }: { agentId: string; onSaved: () => void
                   disabled={!enabled.has(b.id)}
                   onClick={e => e.stopPropagation()}
                   onChange={e => setPolicy(b.id, e.target.value as ToolPermissionType)}
-                  title="Auto runs without asking; Ask pauses for confirmation"
+                  title="「自动」直接运行不询问；「询问」会暂停等待确认"
                 >
-                  <option value="always_allow">Auto</option>
-                  <option value="always_ask">Ask</option>
+                  <option value="always_allow">自动</option>
+                  <option value="always_ask">询问</option>
                 </select>
               </label>
             ))}
@@ -262,7 +262,7 @@ function BuiltinTab({ agentId, onSaved }: { agentId: string; onSaved: () => void
           onClick={save}
           disabled={!dirty || saving}
         >
-          {saving ? 'Saving…' : 'Save'}
+          {saving ? '保存中…' : '保存'}
         </button>
       </div>
     </>
@@ -285,7 +285,7 @@ function McpTab({ agentId, onSaved }: { agentId: string; onSaved: () => void }) 
         setCatalog(cat);
         setInstalled(inst.names);
       })
-      .catch(e => { if (!cancelled) setErr(e instanceof Error ? e.message : 'Failed'); })
+      .catch(e => { if (!cancelled) setErr(e instanceof Error ? e.message : '失败'); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [agentId]);
@@ -300,7 +300,7 @@ function McpTab({ agentId, onSaved }: { agentId: string; onSaved: () => void }) 
   return (
     <>
       <div style={S.body}>
-        {loading && <div style={{ color: '#64748b' }}>Loading…</div>}
+        {loading && <div style={{ color: '#64748b' }}>加载中…</div>}
         {err && <div style={S.err}>{err}</div>}
         {!loading && catalog.length === 0 && (
           <div style={{ color: '#94a3b8', padding: 24, textAlign: 'center' }}>
@@ -364,8 +364,8 @@ function McpAddForm({ entry, existingNames, onCancel, onSubmit }: AddFormProps) 
   const [err, setErr] = useState<string | null>(null);
 
   async function submit() {
-    if (!name.trim()) { setErr('Name is required'); return; }
-    if (existingNames.has(name.trim())) { setErr('That name is already in use'); return; }
+    if (!name.trim()) { setErr('名称为必填项'); return; }
+    if (existingNames.has(name.trim())) { setErr('该名称已被占用'); return; }
     setBusy(true); setErr(null);
     try {
       const server: McpServerConfig = {
@@ -382,7 +382,7 @@ function McpAddForm({ entry, existingNames, onCancel, onSubmit }: AddFormProps) 
       }
       await onSubmit(name.trim(), server);
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Add failed');
+      setErr(e instanceof Error ? e.message : '添加失败');
     } finally {
       setBusy(false);
     }
@@ -399,7 +399,7 @@ function McpAddForm({ entry, existingNames, onCancel, onSubmit }: AddFormProps) 
           {entry.url && <> &middot; URL: <code>{entry.url}</code></>}
         </div>
 
-        <label style={S.formLabel}>Server name (key in Agent mcpServers)</label>
+        <label style={S.formLabel}>服务器名称（Agent mcpServers 中的 key）</label>
         <input
           style={S.formInput}
           value={name}
@@ -410,7 +410,7 @@ function McpAddForm({ entry, existingNames, onCancel, onSubmit }: AddFormProps) 
 
         {(entry.requiredEnv ?? []).length > 0 && (
           <>
-            <div style={{ ...S.formLabel, marginTop: 18 }}>Environment variables</div>
+            <div style={{ ...S.formLabel, marginTop: 18 }}>环境变量</div>
             <div style={{ fontSize: '0.78rem', color: '#64748b', marginBottom: 6 }}>
               Leave blank to use the process environment (recommended for secrets).
             </div>
@@ -457,7 +457,7 @@ function McpAddForm({ entry, existingNames, onCancel, onSubmit }: AddFormProps) 
               opacity: busy || !name.trim() ? 0.6 : 1,
             }}
           >
-            {busy ? 'Adding…' : 'Add server'}
+            {busy ? '添加中…' : '添加服务器'}
           </button>
         </div>
       </div>

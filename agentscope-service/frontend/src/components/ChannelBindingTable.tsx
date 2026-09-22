@@ -25,18 +25,18 @@ interface Props {
 }
 
 const TIERS: { value: BindingTier; label: string; field: keyof BindingCreateRequest | 'roles' }[] = [
-  { value: 'peer',       label: 'Peer (most specific)', field: 'peer' },
-  { value: 'parentPeer', label: 'Parent peer',          field: 'parentPeer' },
-  { value: 'guildRoles', label: 'Guild + roles',        field: 'roles' },
+  { value: 'peer',       label: 'Peer（最精确）', field: 'peer' },
+  { value: 'parentPeer', label: '父 peer',          field: 'parentPeer' },
+  { value: 'guildRoles', label: 'Guild + 角色',        field: 'roles' },
   { value: 'guild',      label: 'Guild',                field: 'guild' },
-  { value: 'team',       label: 'Platform team ID',                 field: 'team' },
-  { value: 'account',    label: 'Account',              field: 'account' },
-  { value: 'channel',    label: 'Channel (catch-all)',  field: 'channel' },
+  { value: 'team',       label: '平台 Team ID',                 field: 'team' },
+  { value: 'account',    label: '账号',              field: 'account' },
+  { value: 'channel',    label: 'Channel（兜底）',  field: 'channel' },
 ];
 
 const SCOPES: { value: NonNullable<BindingCreateRequest['sessionScope']>; label: string }[] = [
-  { value: 'PER_PEER', label: 'Per person — one session per sender' },
-  { value: 'MAIN', label: 'Shared inbox — single session for all DMs' },
+  { value: 'PER_PEER', label: '每人独立 —— 每个发送者一个 Session' },
+  { value: 'MAIN', label: '共享收件箱 —— 所有私聊共用一个 Session' },
 ];
 
 const S: Record<string, React.CSSProperties> = {
@@ -163,7 +163,7 @@ export default function ChannelBindingTable({ agentId }: Props) {
       setChannels(c);
       setBindings(b);
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed to load');
+      setErr(e instanceof Error ? e.message : '加载失败');
     }
   }
 
@@ -190,7 +190,7 @@ export default function ChannelBindingTable({ agentId }: Props) {
       setDirty(true);
       reload();
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Save failed');
+      setErr(e instanceof Error ? e.message : '保存失败');
     }
   }
 
@@ -201,7 +201,7 @@ export default function ChannelBindingTable({ agentId }: Props) {
       setDirty(true);
       reload();
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Delete failed');
+      setErr(e instanceof Error ? e.message : '删除失败');
     }
   }
 
@@ -211,13 +211,13 @@ export default function ChannelBindingTable({ agentId }: Props) {
       setDirty(true);
       reload();
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed');
+      setErr(e instanceof Error ? e.message : '失败');
     }
   }
 
   return (
     <div style={S.root}>
-      <h2 style={S.title}>Channels</h2>
+      <h2 style={S.title}>Channel</h2>
       {dirty && (
         <div style={S.banner}>
           ⚠ Channel adapters that do not support live config swap will pick up binding changes on
@@ -226,7 +226,7 @@ export default function ChannelBindingTable({ agentId }: Props) {
         </div>
       )}
       {err && <div style={{ ...S.err, marginBottom: 8 }}>{err}</div>}
-      {channels.length === 0 && <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>No channels registered.</div>}
+      {channels.length === 0 && <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>尚未注册 Channel。</div>}
       {channels.map(c => {
         const isDefault = c.defaultAgentId === agentId;
         const myBindings = byChannel[c.channelId] ?? [];
@@ -239,22 +239,22 @@ export default function ChannelBindingTable({ agentId }: Props) {
               {isDefault && <span style={S.defaultMark}>default</span>}
               <span style={{ flex: 1 }} />
               {!isDefault && (
-                <button style={S.btnSm} onClick={() => handleSetDefault(c.channelId)}>Set as default</button>
+                <button style={S.btnSm} onClick={() => handleSetDefault(c.channelId)}>设为默认</button>
               )}
               <button
                 style={{ ...S.btnSm, ...S.btnPrimary }}
                 onClick={() => setEditing({ form: emptyForm(c.channelId), index: null })}
-              >+ Add binding</button>
+              >+ 添加绑定</button>
             </div>
             {myBindings.length === 0 ? (
-              <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>No bindings on this channel.</div>
+              <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>该 Channel 上暂无绑定。</div>
             ) : myBindings.map(b => (
               <div key={`${b.channelId}-${b.index}`} style={S.bindingRow}>
                 <span style={{ ...S.badge, background: '#eef2ff', color: '#4338ca', borderColor: '#c7d2fe' }}>{b.tier}</span>
                 <span style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.86rem', color: '#475569' }}>{describe(b)}</span>
                 {b.sessionScope && <span style={S.badge}>{b.sessionScope}</span>}
-                <button style={S.btnSm} onClick={() => setEditing({ form: bindingToForm(b), index: b.index })}>Edit</button>
-                <button style={{ ...S.btnSm, color: '#dc2626', borderColor: '#fca5a5' }} onClick={() => handleDelete(b)}>Delete</button>
+                <button style={S.btnSm} onClick={() => setEditing({ form: bindingToForm(b), index: b.index })}>编辑</button>
+                <button style={{ ...S.btnSm, color: '#dc2626', borderColor: '#fca5a5' }} onClick={() => handleDelete(b)}>删除</button>
               </div>
             ))}
           </div>
@@ -303,11 +303,11 @@ function BindingDialog({ state, isNew, onChange, onCancel, onSave }: DialogProps
   return (
     <div style={D.scrim} onClick={onCancel}>
       <div style={D.modal} onClick={e => e.stopPropagation()}>
-        <h3 style={D.title}>{isNew ? 'Add binding' : 'Edit binding'} on {state.channelId}</h3>
+        <h3 style={D.title}>{isNew ? '添加绑定' : '编辑绑定'} on {state.channelId}</h3>
 
         <div style={S.formGrid}>
           <div>
-            <label style={S.fieldLabel}>Tier (evaluation order)</label>
+            <label style={S.fieldLabel}>层级（评估顺序）</label>
             <select
               style={S.input}
               value={state.tier}
@@ -317,13 +317,13 @@ function BindingDialog({ state, isNew, onChange, onCancel, onSave }: DialogProps
             </select>
           </div>
           <div>
-            <label style={S.fieldLabel}>Session scope (optional)</label>
+            <label style={S.fieldLabel}>Session 作用域（可选）</label>
             <select
               style={S.input}
               value={state.sessionScope}
               onChange={e => onChange({ ...state, sessionScope: e.target.value as FormState['sessionScope'] })}
             >
-              <option value="">— inherit channel —</option>
+              <option value="">— 继承 Channel 设置 —</option>
               {SCOPES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
@@ -348,7 +348,7 @@ function BindingDialog({ state, isNew, onChange, onCancel, onSave }: DialogProps
               <input style={S.input} value={state.guild} onChange={e => onChange({ ...state, guild: e.target.value })} />
             </div>
             <div>
-              <label style={S.fieldLabel}>Roles (comma-separated)</label>
+              <label style={S.fieldLabel}>角色（逗号分隔）</label>
               <input style={S.input} value={state.roles} onChange={e => onChange({ ...state, roles: e.target.value })} placeholder="admin, support" />
             </div>
           </div>
@@ -373,14 +373,14 @@ function BindingDialog({ state, isNew, onChange, onCancel, onSave }: DialogProps
         )}
         {tierField === 'channel' && (
           <div style={{ marginTop: 10 }}>
-            <label style={S.fieldLabel}>Channel match (leave blank for catch-all)</label>
+            <label style={S.fieldLabel}>Channel 匹配（留空表示兜底）</label>
             <input style={S.input} value={state.channel} onChange={e => onChange({ ...state, channel: e.target.value })} placeholder={state.channelId} />
           </div>
         )}
 
         <div style={D.actions}>
-          <button style={S.btnSm} onClick={onCancel}>Cancel</button>
-          <button style={{ ...S.btnSm, ...S.btnPrimary }} onClick={onSave}>{isNew ? 'Create' : 'Save'}</button>
+          <button style={S.btnSm} onClick={onCancel}>取消</button>
+          <button style={{ ...S.btnSm, ...S.btnPrimary }} onClick={onSave}>{isNew ? '创建' : '保存'}</button>
         </div>
       </div>
     </div>

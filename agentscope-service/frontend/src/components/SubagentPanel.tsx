@@ -181,7 +181,7 @@ export default function SubagentPanel({ agentId, onChanged, readOnly = false }: 
       const list = await listSubagents(agentId);
       setItems(list);
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed to load subagents');
+      setErr(e instanceof Error ? e.message : '加载 Subagent 失败');
     } finally {
       setLoading(false);
     }
@@ -217,12 +217,12 @@ export default function SubagentPanel({ agentId, onChanged, readOnly = false }: 
 
   async function handleSave() {
     if (!form.description.trim()) {
-      setFormErr('Description is required');
+      setFormErr('描述为必填项');
       return;
     }
     const nameVal = form.name.trim();
     if (!nameVal) {
-      setFormErr('Name is required');
+      setFormErr('名称为必填项');
       return;
     }
     setSaving(true);
@@ -243,7 +243,7 @@ export default function SubagentPanel({ agentId, onChanged, readOnly = false }: 
       await reload();
       onChanged?.();
     } catch (e: unknown) {
-      setFormErr(e instanceof Error ? e.message : 'Save failed');
+      setFormErr(e instanceof Error ? e.message : '保存失败');
     } finally {
       setSaving(false);
     }
@@ -257,7 +257,7 @@ export default function SubagentPanel({ agentId, onChanged, readOnly = false }: 
       await reload();
       onChanged?.();
     } catch (e: unknown) {
-      setFormErr(e instanceof Error ? e.message : 'Delete failed');
+      setFormErr(e instanceof Error ? e.message : '删除失败');
     }
   }
 
@@ -282,7 +282,7 @@ export default function SubagentPanel({ agentId, onChanged, readOnly = false }: 
       await reload();
       onChanged?.();
     } catch (e: unknown) {
-      setErr(e instanceof Error ? e.message : 'Failed to add subagent');
+      setErr(e instanceof Error ? e.message : '添加 Subagent 失败');
     }
   }
 
@@ -296,25 +296,25 @@ export default function SubagentPanel({ agentId, onChanged, readOnly = false }: 
       <div style={S.root}>
         <div style={S.overlay} onClick={() => setView('list')}>
           <div style={S.dialog} onClick={e => e.stopPropagation()}>
-            <div style={S.dialogTitle}>Add subagent from existing agent</div>
+            <div style={S.dialogTitle}>从已有 Agent 添加 Subagent</div>
             <input
               style={S.searchInput}
-              placeholder="Search agents..."
+              placeholder="搜索 Agent…"
               value={search}
               onChange={e => setSearch(e.target.value)}
               autoFocus
             />
             <div style={S.dialogList}>
-              {pickerLoading && <div style={S.empty}>Loading…</div>}
+              {pickerLoading && <div style={S.empty}>加载中…</div>}
               {!pickerLoading && filteredAgents.length === 0 && (
-                <div style={S.empty}>No agents found</div>
+                <div style={S.empty}>未找到 Agent</div>
               )}
               {filteredAgents.map(a => (
                 <AgentPickerRow key={a.id} agent={a} onPick={pickAgent} />
               ))}
             </div>
             <div style={{ marginTop: 12, textAlign: 'right' }}>
-              <button style={S.btn} onClick={() => setView('list')}>Cancel</button>
+              <button style={S.btn} onClick={() => setView('list')}>取消</button>
             </div>
           </div>
         </div>
@@ -327,11 +327,11 @@ export default function SubagentPanel({ agentId, onChanged, readOnly = false }: 
       <div style={S.root}>
         <div style={S.header}>
           <button style={S.btn} onClick={() => setView('list')}>← Back</button>
-          <span style={S.title}>{isNew ? 'New subagent' : `Edit: ${form.name}`}</span>
+          <span style={S.title}>{isNew ? '新建 Subagent' : `Edit: ${form.name}`}</span>
         </div>
         <div style={S.scroll}>
           <div style={S.row}>
-            <label style={S.fieldLabel}>Name *</label>
+            <label style={S.fieldLabel}>名称 *</label>
             <input
               style={S.input}
               value={form.name}
@@ -341,17 +341,17 @@ export default function SubagentPanel({ agentId, onChanged, readOnly = false }: 
             />
           </div>
           <div style={S.row}>
-            <label style={S.fieldLabel}>Description *</label>
+            <label style={S.fieldLabel}>描述 *</label>
             <input
               style={S.input}
               value={form.description}
               onChange={e => setForm({ ...form, description: e.target.value })}
-              placeholder="What this subagent does — used by the orchestrator to decide when to delegate"
+              placeholder="该 Subagent 的职责 —— 编排器据此决定何时委派"
             />
           </div>
           <div style={{ ...S.row, ...S.inlineRow }}>
             <div style={S.inlineField}>
-              <label style={S.fieldLabel}>Model</label>
+              <label style={S.fieldLabel}>模型</label>
               <input
                 style={S.input}
                 value={form.model}
@@ -360,7 +360,7 @@ export default function SubagentPanel({ agentId, onChanged, readOnly = false }: 
               />
             </div>
             <div style={S.inlineField}>
-              <label style={S.fieldLabel}>Max iterations</label>
+              <label style={S.fieldLabel}>最大迭代次数</label>
               <input
                 style={S.input}
                 type="number"
@@ -371,7 +371,7 @@ export default function SubagentPanel({ agentId, onChanged, readOnly = false }: 
             </div>
           </div>
           <div style={S.row}>
-            <label style={S.fieldLabel}>Tools (comma-separated)</label>
+            <label style={S.fieldLabel}>工具（逗号分隔）</label>
             <input
               style={S.input}
               value={form.tools}
@@ -380,7 +380,7 @@ export default function SubagentPanel({ agentId, onChanged, readOnly = false }: 
             />
           </div>
           <div style={S.row}>
-            <label style={S.fieldLabel}>Workspace mode</label>
+            <label style={S.fieldLabel}>Workspace 模式</label>
             <div style={S.radio}>
               <label style={S.radioLabel}>
                 <input
@@ -401,33 +401,33 @@ export default function SubagentPanel({ agentId, onChanged, readOnly = false }: 
           <p style={{ fontSize: 12, color: '#64748b' }}>Hosted Codex and Qoder require Shared workspace mode. Codex inherits the parent permissions and does not accept per-subagent tool or iteration limits. Qoder supports native tool names and maps max iterations to max turns. Managed runtimes also support isolated workspaces.</p>
           {form.workspaceMode === 'isolated' && (
             <div style={S.row}>
-              <label style={S.fieldLabel}>Workspace path (optional)</label>
+              <label style={S.fieldLabel}>Workspace 路径（可选）</label>
               <input
                 style={S.input}
                 value={form.workspacePath}
                 onChange={e => setForm({ ...form, workspacePath: e.target.value })}
-                placeholder="Leave blank to create a separate workspace automatically"
+                placeholder="留空则自动创建独立 Workspace"
               />
             </div>
           )}
           <div style={S.row}>
-            <label style={S.fieldLabel}>Subagent instructions</label>
+            <label style={S.fieldLabel}>Subagent 指令</label>
             <textarea
               style={S.textarea}
               value={form.inlineBody}
               onChange={e => setForm({ ...form, inlineBody: e.target.value })}
-              placeholder="Optional system prompt for this subagent. Not used when workspace path is set."
+              placeholder="该 Subagent 的可选系统提示词。设置了 workspace 路径时不生效。"
             />
           </div>
           {formErr && <div style={{ ...S.status, ...S.errText }}>{formErr}</div>}
-          {formOk && <div style={{ ...S.status, ...S.ok }}>Saved</div>}
+          {formOk && <div style={{ ...S.status, ...S.ok }}>已保存</div>}
           {!readOnly && (
             <div style={S.formActions}>
               <button style={S.primaryBtn} onClick={handleSave} disabled={saving}>
-                {saving ? 'Saving…' : 'Save'}
+                {saving ? '保存中…' : '保存'}
               </button>
               {!isNew && (
-                <button style={S.dangerBtn} onClick={handleDelete}>Delete</button>
+                <button style={S.dangerBtn} onClick={handleDelete}>删除</button>
               )}
             </div>
           )}
@@ -440,17 +440,17 @@ export default function SubagentPanel({ agentId, onChanged, readOnly = false }: 
   return (
     <div style={S.root}>
       <div style={S.header}>
-        <span style={S.title}>Subagents</span>
+        <span style={S.title}>Subagent</span>
         {!readOnly && (
           <>
-            <button style={S.btn} onClick={openPicker}>+ From agent</button>
+            <button style={S.btn} onClick={openPicker}>+ 从 Agent 添加</button>
             <button style={S.primaryBtn} onClick={handleNew}>+ New</button>
           </>
         )}
       </div>
       <div style={S.scroll}>
         {err && <div style={S.err}>{err}</div>}
-        {loading && <div style={S.empty}>Loading…</div>}
+        {loading && <div style={S.empty}>加载中…</div>}
         {!loading && !err && items.length === 0 && (
           <div style={S.empty}>
             No subagents configured yet.<br />

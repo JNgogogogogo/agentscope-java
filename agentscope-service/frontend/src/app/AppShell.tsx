@@ -66,60 +66,60 @@ type NavItem = {
 type NavGroup = { label?: string; items: NavItem[] };
 
 const navigation: NavGroup[] = [
-  { items: [{ to: '/work/overview', label: 'Overview', icon: CircleGauge, end: true }] },
+  { items: [{ to: '/work/overview', label: '概览', icon: CircleGauge, end: true }] },
   {
-    label: 'Work',
+    label: '工作',
     items: [
-      { to: '/work/chat', label: 'Chat', icon: MessageSquare },
-      { to: '/work/issues', label: 'Issues', icon: FileStack },
+      { to: '/work/chat', label: '对话', icon: MessageSquare },
+      { to: '/work/issues', label: 'Issue', icon: FileStack },
       { to: '/work/inbox', label: 'Inbox', icon: ClipboardCheck },
-      { to: '/work/automations', label: 'Automations', icon: BriefcaseBusiness },
+      { to: '/work/automations', label: 'Automation', icon: BriefcaseBusiness },
     ],
   },
   {
-    label: 'Design',
+    label: '设计',
     items: [
-      { to: '/agent-center/agents', label: 'Agents', icon: Bot, agentCenter: true },
-      { to: '/agent-center/teams', label: 'Teams', icon: UsersRound, agentCenter: true },
-      { to: '/agent-center/workflows', label: 'Workflows', icon: Network, agentCenter: true },
-      { to: '/agent-center/entrypoints', label: 'Channels', icon: Network, agentCenter: true, configure: true },
+      { to: '/agent-center/agents', label: 'Agent', icon: Bot, agentCenter: true },
+      { to: '/agent-center/teams', label: 'Team', icon: UsersRound, agentCenter: true },
+      { to: '/agent-center/workflows', label: 'Workflow', icon: Network, agentCenter: true },
+      { to: '/agent-center/entrypoints', label: 'Channel', icon: Network, agentCenter: true, configure: true },
     ],
   },
   {
-    label: 'Resources',
+    label: '资源',
     items: [
-      { to: '/agent-center/workspaces', configure: true, label: 'Workspaces', icon: FileStack, agentCenter: true },
-      { to: '/agent-center/environments', configure: true, label: 'Environments', icon: Settings2, agentCenter: true },
-      { to: '/agent-center/memory', configure: true, label: 'Memory', icon: Database, agentCenter: true },
+      { to: '/agent-center/workspaces', configure: true, label: 'Workspace', icon: FileStack, agentCenter: true },
+      { to: '/agent-center/environments', configure: true, label: '环境', icon: Settings2, agentCenter: true },
+      { to: '/agent-center/memory', configure: true, label: '记忆', icon: Database, agentCenter: true },
       { to: '/agent-center/vaults', configure: true, label: 'Vault', icon: ShieldCheck, agentCenter: true },
     ],
   },
 ];
 
 const routeLabels: Array<[string, string]> = [
-  ['/work/overview', 'Overview'],
-  ['/work/chat', 'Chat'],
-  ['/work/issues', 'Issues'],
+  ['/work/overview', '概览'],
+  ['/work/chat', '对话'],
+  ['/work/issues', 'Issue'],
   ['/work/inbox', 'Inbox'],
-  ['/work/automations', 'Automations'],
-  ['/work/activity', 'Activity'],
-  ['/work/executions', 'Executions'],
-  ['/work/sessions', 'Sessions'],
-  ['/agent-center/agents', 'Agents'],
-  ['/agent-center/teams', 'Teams'],
-  ['/agent-center/workflows', 'Workflows'],
-  ['/agent-center/endpoints', 'API details'],
-  ['/agent-center/entrypoints', 'Channels'],
-  ['/agent-center/workspaces', 'Workspaces'],
-  ['/agent-center/environments', 'Environments'],
-  ['/agent-center/memory', 'Memory'],
+  ['/work/automations', 'Automation'],
+  ['/work/activity', '活动'],
+  ['/work/executions', '执行记录'],
+  ['/work/sessions', 'Session'],
+  ['/agent-center/agents', 'Agent'],
+  ['/agent-center/teams', 'Team'],
+  ['/agent-center/workflows', 'Workflow'],
+  ['/agent-center/endpoints', 'API 详情'],
+  ['/agent-center/entrypoints', 'Channel'],
+  ['/agent-center/workspaces', 'Workspace'],
+  ['/agent-center/environments', '环境'],
+  ['/agent-center/memory', '记忆'],
   ['/agent-center/vaults', 'Vault'],
-  ['/managed/profile', 'Profile'],
-  ['/managed/admin/users', 'Users'],
-  ['/settings/namespaces', 'Namespaces'],
-  ['/settings/users', 'Users'],
-  ['/settings/access-log', 'Access log'],
-  ['/settings/profile', 'Profile'],
+  ['/managed/profile', '个人资料'],
+  ['/managed/admin/users', '用户'],
+  ['/settings/namespaces', '空间'],
+  ['/settings/users', '用户'],
+  ['/settings/access-log', '访问日志'],
+  ['/settings/profile', '个人资料'],
 ];
 
 function matches(pathname: string, to: string, end?: boolean): boolean {
@@ -147,8 +147,8 @@ function SidebarLink({ item, attention }: { item: NavItem; attention?: ApprovalA
       {!!attention?.total && (
         <span
           className="inline-flex min-w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-amber-800"
-          aria-label={`${attention.total} items need attention`}
-          title={`${attention.pending} pending confirmation${attention.pending === 1 ? '' : 's'} · ${attention.unread} unread notification${attention.unread === 1 ? '' : 's'}`}
+          aria-label={`${attention.total} 项待处理`}
+          title={`${attention.pending} 项待确认 · ${attention.unread} 条未读通知`}
         >
           {formatAttentionCount(attention.total)}
         </span>
@@ -194,23 +194,23 @@ export default function AppShell() {
         href="#main-content"
         className="fixed left-3 top-3 z-50 -translate-y-20 rounded-md bg-primary px-3 py-2 text-sm text-white focus:translate-y-0"
       >
-        Skip to content
+        跳到主内容
       </a>
-      {mobileNavOpen && <button type="button" aria-label="Close navigation" className="fixed inset-0 z-30 bg-slate-950/35 lg:hidden" onClick={() => setMobileNavOpen(false)} />}
+      {mobileNavOpen && <button type="button" aria-label="关闭导航" className="fixed inset-0 z-30 bg-slate-950/35 lg:hidden" onClick={() => setMobileNavOpen(false)} />}
       <aside className={cn('fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col border-r border-border bg-white transition-transform lg:static lg:z-auto lg:translate-x-0', mobileNavOpen ? 'translate-x-0' : '-translate-x-full')}>
         <div className="border-b border-border px-4 py-4">
           <Link className="flex items-center gap-3 rounded-lg" to="/work/overview">
             <img src="/logo.svg" alt="AgentScope" className="h-9 w-9 shrink-0" width={36} height={36} />
             <div className="min-w-0">
               <div className="text-lg font-bold tracking-tight text-foreground">AgentScope Service</div>
-              <div className="truncate text-xs text-muted-foreground">Control plane</div>
+              <div className="truncate text-xs text-muted-foreground">控制台</div>
             </div>
           </Link>
         </div>
 
         <NamespaceSwitcher />
 
-        <nav aria-label="Primary navigation" className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
+        <nav aria-label="主导航" className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
           {visibleNavigation.map((group, index) => <div key={group.label || `primary-${index}`} className="space-y-1">
             {group.label && <div className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">{group.label}</div>}
             {group.items.map((item) => <SidebarLink key={item.to} item={item} attention={item.to === '/work/inbox' ? approvalAttention : undefined} />)}
@@ -218,15 +218,15 @@ export default function AppShell() {
         </nav>
 
         <div className="border-t border-border p-3">
-          <div className="mb-2 truncate px-2 text-xs text-muted-foreground">Signed in as {username || 'guest'}</div>
+          <div className="mb-2 truncate px-2 text-xs text-muted-foreground">当前登录：{username || '访客'}</div>
           <div className="flex gap-1">
-            <Button variant="ghost" size="sm" className="flex-1 px-2" onClick={() => navigate('/settings/namespaces')}>Access settings</Button>
-            <Button variant="ghost" size="sm" className="flex-1 px-2" onClick={() => navigate('/settings/profile')}>Profile</Button>
+            <Button variant="ghost" size="sm" className="flex-1 px-2" onClick={() => navigate('/settings/namespaces')}>访问设置</Button>
+            <Button variant="ghost" size="sm" className="flex-1 px-2" onClick={() => navigate('/settings/profile')}>个人资料</Button>
             <Button
               variant="ghost"
               size="icon"
-              aria-label="Sign out"
-              title="Sign out"
+              aria-label="退出登录"
+              title="退出登录"
               onClick={async () => { try { await logoutAccount(); } finally { clearToken(); navigate('/login'); } }}
             >
               <LogOut className="h-4 w-4" />
@@ -238,12 +238,12 @@ export default function AppShell() {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex min-h-14 shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border bg-white px-3 py-2 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
-            <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open navigation" onClick={() => setMobileNavOpen(true)}><Menu className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" className="lg:hidden" aria-label="打开导航" onClick={() => setMobileNavOpen(true)}><Menu className="h-4 w-4" /></Button>
             <div className="hidden min-w-0 text-sm font-medium text-foreground xl:block">{context?.[1] || 'AgentScope'}</div>
           </div>
           <div className="flex items-center gap-3">
-            {accessLink && <Link className="text-xs font-medium text-indigo-600" to={accessLink}>Access & dependencies</Link>}
-            <button type="button" onClick={openCommand} className="flex h-8 items-center gap-2 rounded-lg border border-border bg-muted px-2 text-xs text-muted-foreground hover:bg-slate-100 sm:min-w-52 sm:px-3" aria-label="Search"><Search className="h-3.5 w-3.5" /><span className="hidden flex-1 text-left sm:block">Search</span><kbd className="hidden rounded border bg-white px-1.5 py-0.5 font-mono text-[10px] sm:block">⌘K</kbd></button>
+            {accessLink && <Link className="text-xs font-medium text-indigo-600" to={accessLink}>访问与依赖</Link>}
+            <button type="button" onClick={openCommand} className="flex h-8 items-center gap-2 rounded-lg border border-border bg-muted px-2 text-xs text-muted-foreground hover:bg-slate-100 sm:min-w-52 sm:px-3" aria-label="搜索"><Search className="h-3.5 w-3.5" /><span className="hidden flex-1 text-left sm:block">搜索</span><kbd className="hidden rounded border bg-white px-1.5 py-0.5 font-mono text-[10px] sm:block">⌘K</kbd></button>
             {scope.selectorVisible && <div className="hidden font-mono text-xs text-muted-foreground md:block">{scope.tenant} / {scope.namespace}</div>}
           </div>
         </header>
