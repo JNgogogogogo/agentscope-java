@@ -1,6 +1,7 @@
 ---
 title: Release Notes
 description: Per-version change records for AgentScope Java
+zh_link: /v2/zh/docs/others/release-notes
 ---
 
 This page tracks per-version changes for AgentScope Java 2.0. For the overall migration guide from 1.x, see the [V1 Migration Guide](/v2/en/docs/change-log).
@@ -156,7 +157,7 @@ A new PermissionEngine establishes a three-state decision mechanism for tool cal
 
 **Middleware Extension Mechanism**
 
-A five-stage onion + pipeline hybrid model (`onAgent` / `onReasoning` / `onActing` / `onModelCall` / `onSystemPrompt`), providing flexible extension points for logging, tracing, security checks, business policies, and context injection while keeping the core framework stable
+A six-stage onion, pipeline, and notification model (`onAgent` / `onReasoning` / `onActing` / `onModelCall` / `onSystemPrompt` / `onAgentStateReady`), providing flexible extension points for logging, tracing, security checks, business policies, and context injection while keeping the core framework stable
 
 **Context Engineering**
 
